@@ -189,6 +189,13 @@ const CaseStudyCard = ({ study }: { study: CaseStudy; key?: React.Key }) => {
             </div>
             <div className="mb-10">
               <ArchitectureDiagramPlaceholder title={study.name} />
+              <div className="mt-6 flex flex-wrap gap-2">
+                {study.focus.map(f => (
+                  <span key={f} className="px-3 py-1 bg-zinc-900 border border-zinc-800 text-indigo-400 text-[10px] rounded-full uppercase tracking-wider font-bold">
+                    {f}
+                  </span>
+                ))}
+              </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
               <div>
@@ -465,7 +472,7 @@ export default function App() {
             </p>
             <div className="flex flex-wrap gap-8">
               <a
-                href="mailto:hello@callmehalpha.tech"
+                href="mailto:i.am.abdulazeez.yisau@gmail.com"
                 className="flex items-center gap-3 text-white font-bold group focus:outline-none focus-visible:ring-2 focus-visible:ring-white/50 focus-visible:bg-white/5 rounded-xl transition-all p-2 -m-2"
               >
                 <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center group-hover:bg-white/30 group-focus-visible:bg-white/30 transition-colors">
@@ -474,7 +481,7 @@ export default function App() {
                 Email
               </a>
               <a
-                href="https://linkedin.com"
+                href="https://www.linkedin.com/in/abdulazeez-yisau-tech-ceo/"
                 className="flex items-center gap-3 text-white font-bold group focus:outline-none focus-visible:ring-2 focus-visible:ring-white/50 focus-visible:bg-white/5 rounded-xl transition-all p-2 -m-2"
               >
                 <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center group-hover:bg-white/30 group-focus-visible:bg-white/30 transition-colors">
@@ -491,9 +498,9 @@ export default function App() {
       <footer className="py-12 px-6 border-t border-zinc-900">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-4 text-zinc-600 font-mono text-xs uppercase tracking-widest">
-            <span>&copy; 2024 CALLMEHALPHA</span>
+            <span>&copy; {new Date().getFullYear()} CALLMEHALPHA</span>
             <span className="h-4 w-px bg-zinc-800"></span>
-            <span>SYSTEMS BUILDER</span>
+            <span>STACKSMITH</span>
           </div>
           <div className="flex items-center gap-4 text-zinc-600 font-mono text-[10px] uppercase">
             <span>v2.4.0-STABLE</span>

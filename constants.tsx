@@ -18,17 +18,17 @@ export const CAPABILITIES: Capability[] = [
   {
     title: "Backend Engineering",
     description: "Building robust API layers and business logic with a focus on performance and type safety.",
-    items: ["Node.js/TypeScript", "Go", "PostgreSQL/Redis", "gRPC/REST"]
+    items: ["Node.js/TypeScript", "Go", "PostgreSQL/Redis", "gRPC/REST", "LARAVEL/PHP"]
   },
   {
     title: "Infrastructure & DevOps",
     description: "Treating infrastructure as code to ensure reproducible environments and automated scaling.",
-    items: ["Kubernetes", "AWS/GCP", "Terraform", "CI/CD Pipelines"]
+    items: ["Kubernetes", "AWS/GCP", "Terraform", "CI/CD Pipelines", "Docker", "CodeRabbbit"]
   },
   {
     title: "Payments & Fintech Systems",
     description: "Developing mission-critical financial systems where accuracy and transaction integrity are non-negotiable.",
-    items: ["Ledgering", "KYC/KYB Integration", "Fraud Detection", "Stripe/Adyen"]
+    items: ["Double Entry Ledgering", "KYC/KYB Integration", "Fraud Detection", "Stripe", "Paystack", "Flutterwave", "Multi-currency support"]
   }
 ];
 
@@ -37,18 +37,29 @@ export const CASE_STUDIES: CaseStudy[] = [
     id: "virtuosphere",
     name: "Virtuosphere",
     url: "https://v1.virtuobusiness.com",
-    focus: ["Multi-tenant architecture", "Institutional onboarding", "Payments & identity"],
-    context: "A multi-tenant platform built to handle complex institutional onboarding and resource management for enterprise clients.",
-    role: "Lead Architect & Systems Engineer. Owned the core platform design from inception to production.",
-    architecture: "Modular monolith transitioning to micro-services. Utilized PostgreSQL with row-level security (RLS) for tenant isolation and Redis for session management.",
-    decisions: [
-      "Implemented a custom RBAC system to handle hierarchical institutional roles.",
-      "Used an event-driven approach for background KYC/KYB processing to keep the UI responsive.",
-      "Architected a pluggable payment provider system to allow switching between gateways without rewriting business logic."
+    focus: [
+      "Education management systems",
+      "NFC-based identity & payments",
+      "Multi-tenant institutional platforms"
     ],
-    challenges: "Balancing the flexibility required by different enterprise tenants with the need for a shared, maintainable core codebase.",
-    outcome: "Successfully onboarded multiple high-tier institutional clients with zero data leakage between tenants.",
-    lessons: "Strict schema boundaries are more valuable than abstract 'flexibility'. Explicit constraints prevent cascading failures."
+    context:
+      "Virtuosphere is a multi-tenant education management platform built for primary, secondary, and tertiary institutions. It combines academic administration with NFC-based identity and cashless payment infrastructure, designed for environments where authority, scale, and operational reliability are critical.",
+    role:
+      "Lead Architect & Systems Engineer. Led the platform from idea to production, including system design, infrastructure, hardware integration, and institutional rollout.",
+    architecture:
+      "Dockerized modular monolith built with NestJS for backend services, Next.js for administrative and web interfaces, and React Native for mobile applications. PostgreSQL is used as the primary datastore with strict tenant isolation (RLS) to separate schools and departments, while Redis handles session management, queues, and event-driven workflows. Custom services interface with NFC-enabled devices for identity, attendance, and on-premise payments.",
+    decisions: [
+      "Designed the system around institutional authority: school admins, departments, and staff roles were modeled before individual users.",
+      "Built a custom service to communicate with NFC-enabled devices manufactured in China, enabling real-time identity verification, attendance tracking, and on-campus transactions.",
+      "Implemented NFC cards as a unified identity layer for students and staff, supporting access control, attendance, and closed-loop payments within school premises.",
+      "Separated payment and identity domains from academic workflows to allow financial operations to scale independently without disrupting core school processes."
+    ],
+    challenges:
+      "Coordinating software, hardware, and financial systems at institutional scale while maintaining tenant isolation, transaction integrity, and operational uptime.",
+    outcome:
+      "Processed payments for over 4,000 students during departmental and SUG fee collections at Federal University of Agriculture Abeokuta. Deployed daily NFC-based attendance and identity verification for over 1,000 students at Foursquare School, with consistent real-time usage.",
+    lessons:
+      "In institutional environments, authority-first design and operational reliability matter more than feature velocity. Systems earn trust when identity, payments, and administration are tightly integrated."
   },
   {
     id: "frootify",
