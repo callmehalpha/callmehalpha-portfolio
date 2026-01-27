@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   Menu, 
   X, 
@@ -15,7 +15,11 @@ import {
   Terminal,
   BookOpen,
   Mail,
-  Linkedin
+  Linkedin,
+  Share2,
+  Twitter,
+  Copy,
+  Check
 } from 'lucide-react';
 import { CASE_STUDIES, PHILOSOPHIES, CAPABILITIES, BUILD_LOGS } from './constants';
 import { CaseStudy, Capability, Philosophy, BuildLog } from './types';
@@ -78,15 +82,79 @@ const ArchitectureDiagramPlaceholder = ({ title }: { title: string }) => (
   </div>
 );
 
-const CaseStudyCard = ({ study }: { study: CaseStudy }) => {
+// Added key?: React.Key to the props type to avoid "Property 'key' does not exist" error when mapping over CASE_STUDIES
+const CaseStudyCard = ({ study }: { study: CaseStudy; key?: React.Key }) => {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isShareOpen, setIsShareOpen] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const shareRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (shareRef.current && !shareRef.current.contains(event.target as Node)) {
+        setIsShareOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleCopyLink = () => {
+    const url = `${window.location.origin}${window.location.pathname}#${study.id}`;
+    navigator.clipboard.writeText(url).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  };
+
+  const shareText = `Check out this technical case study: ${study.name} by @callmehalpha`;
+  const shareUrl = `${window.location.origin}${window.location.pathname}#${study.id}`;
 
   return (
-    <div className="snap-start min-w-[85vw] md:min-w-[calc(33.333%-1rem)] group flex flex-col h-full bg-zinc-900/40 border border-zinc-800 rounded-xl p-8 transition-all duration-300 hover:border-zinc-700">
+    <div id={study.id} className="snap-start min-w-[85vw] md:min-w-[calc(33.333%-1rem)] group flex flex-col h-full bg-zinc-900/40 border border-zinc-800 rounded-xl p-8 transition-all duration-300 hover:border-zinc-700">
       <div className="flex-1">
-        <div className="flex items-center gap-3 mb-4">
-           <span className="text-indigo-500 font-mono text-xs tracking-widest">0{CASE_STUDIES.indexOf(study) + 1}</span>
-           <h3 className="text-xl md:text-2xl font-bold text-white group-hover:text-indigo-300 transition-colors line-clamp-1">{study.name}</h3>
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-3">
+            <span className="text-indigo-500 font-mono text-xs tracking-widest">0{CASE_STUDIES.indexOf(study) + 1}</span>
+            <h3 className="text-xl md:text-2xl font-bold text-white group-hover:text-indigo-300 transition-colors line-clamp-1">{study.name}</h3>
+          </div>
+          <div className="relative" ref={shareRef}>
+            <button 
+              onClick={() => setIsShareOpen(!isShareOpen)}
+              className="p-2 text-zinc-500 hover:text-white hover:bg-zinc-800 rounded-lg transition-colors"
+              title="Share System Review"
+            >
+              <Share2 size={16} />
+            </button>
+            {isShareOpen && (
+              <div className="absolute right-0 top-full mt-2 w-48 bg-zinc-950 border border-zinc-800 rounded-xl shadow-2xl p-2 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+                <button 
+                  onClick={handleCopyLink}
+                  className="w-full flex items-center gap-3 px-3 py-2 text-xs text-zinc-400 hover:text-white hover:bg-zinc-900 rounded-lg transition-colors"
+                >
+                  {copied ? <Check size={14} className="text-green-500" /> : <Copy size={14} />}
+                  {copied ? "Link Copied" : "Copy Deep Link"}
+                </button>
+                <div className="h-px bg-zinc-800 my-1"></div>
+                <a 
+                  href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-3 px-3 py-2 text-xs text-zinc-400 hover:text-white hover:bg-zinc-900 rounded-lg transition-colors"
+                >
+                  <Twitter size={14} /> Share on X
+                </a>
+                <a 
+                  href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-3 px-3 py-2 text-xs text-zinc-400 hover:text-white hover:bg-zinc-900 rounded-lg transition-colors"
+                >
+                  <Linkedin size={14} /> Share on LinkedIn
+                </a>
+              </div>
+            )}
+          </div>
         </div>
         <p className="text-zinc-400 text-sm leading-relaxed mb-6 line-clamp-4">{study.context}</p>
         <div className="flex flex-wrap gap-2 mb-8">
@@ -152,7 +220,8 @@ const CaseStudyCard = ({ study }: { study: CaseStudy }) => {
   );
 };
 
-const BuildLogEntry = ({ log }: { log: BuildLog }) => (
+// Added key?: React.Key to the props type to avoid "Property 'key' does not exist" error when mapping over BUILD_LOGS
+const BuildLogEntry = ({ log }: { log: BuildLog; key?: React.Key }) => (
   <div className="p-8 bg-zinc-950 border border-zinc-800 rounded-lg hover:border-zinc-700 hover:shadow-2xl hover:shadow-indigo-500/5 transition-all duration-300 group snap-start min-w-[85vw] md:min-w-[calc(33.333%-1rem)] flex flex-col h-full">
     <div className="flex justify-between items-start mb-4">
       <span className="text-zinc-500 font-mono text-xs">{log.date}</span>
