@@ -340,10 +340,12 @@ export default function App() {
             Callme<span className="text-zinc-600">halpha</span>
           </h1>
           <p className="text-2xl md:text-3xl font-medium text-zinc-400 mb-10 leading-snug animate-in fade-in slide-in-from-bottom-6 duration-700 delay-200">
-            Systems-focused Software Engineer & Technical Founder.
+            I build systems where trust, scale, and real-world constraints matter.
           </p>
           <p className="text-zinc-500 text-lg md:text-xl max-w-2xl mb-12 leading-relaxed animate-in fade-in slide-in-from-bottom-8 duration-700 delay-300">
-            I design, build, and operate scalable software systems — from multi-tenant platforms to payment infrastructure — with a focus on correctness, ownership, and long-term maintainability.
+            I work on systems where failure is expensive — finance, institutions, operations, and physical infrastructure.
+            My focus is clarity: authority-first design, predictable architectures, and software that survives real usage.
+            I’ve led products from idea to production across education, payments, and operational platforms.
           </p>
           <div className="flex flex-wrap gap-4 animate-in fade-in slide-in-from-bottom-10 duration-700 delay-500">
             <a
