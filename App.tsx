@@ -229,7 +229,7 @@ const CaseStudyCard = ({ study }: { study: CaseStudy; key?: React.Key }) => {
   );
 };
 
-// Added key?: React.Key to the props type to avoid "Property 'key' does not exist" error when mapping over BUILD_LOGS
+
 const BuildLogEntry = ({ log }: { log: BuildLog; key?: React.Key }) => (
   <div className="p-8 bg-zinc-950 border border-zinc-800 rounded-lg hover:border-zinc-700 hover:shadow-2xl hover:shadow-indigo-500/5 transition-all duration-300 group snap-start min-w-[85vw] md:min-w-[calc(33.333%-1rem)] flex flex-col h-full">
     <div className="flex justify-between items-start mb-4">
@@ -243,9 +243,9 @@ const BuildLogEntry = ({ log }: { log: BuildLog; key?: React.Key }) => (
         {log.content}
       </div>
     </div>
-    <button className="mt-8 text-indigo-500 text-[10px] font-bold uppercase tracking-widest flex items-center gap-2 hover:text-indigo-400 transition-colors">
+    <a href={log.url} className="mt-8 text-indigo-500 text-[10px] font-bold uppercase tracking-widest flex items-center gap-2 hover:text-indigo-400 transition-colors">
       Read Full Note <ArrowRight size={14} />
-    </button>
+    </a>
   </div>
 );
 

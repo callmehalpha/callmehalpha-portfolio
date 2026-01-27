@@ -45,7 +45,7 @@ export const CASE_STUDIES: CaseStudy[] = [
     context:
       "Virtuosphere is a multi-tenant education management platform built for primary, secondary, and tertiary institutions. It combines academic administration with NFC-based identity and cashless payment infrastructure, designed for environments where authority, scale, and operational reliability are critical.",
     role:
-      "Lead Architect & Systems Engineer. Led the platform from idea to production, including system design, infrastructure, hardware integration, and institutional rollout.",
+      "CTO / System Lead. Led the platform from idea to production, including system design, infrastructure, hardware integration, and institutional rollout.",
     architecture:
       "Dockerized modular monolith built with NestJS for backend services, Next.js for administrative and web interfaces, and React Native for mobile applications. PostgreSQL is used as the primary datastore with strict tenant isolation (RLS) to separate schools and departments, while Redis handles session management, queues, and event-driven workflows. Custom services interface with NFC-enabled devices for identity, attendance, and on-premise payments.",
     decisions: [
@@ -65,69 +65,74 @@ export const CASE_STUDIES: CaseStudy[] = [
     id: "frootify",
     name: "Frootify",
     url: "https://frootify.tech",
-    focus: ["Backend + frontend ownership", "Operational systems", "Product evolution"],
-    context: "Operational system designed to manage supply chain and distribution logic under real-world logistics constraints.",
-    role: "Full-stack System Lead. Responsible for aligning technical execution with volatile business requirements.",
-    architecture: "Cloud-native architecture leveraging serverless functions for elastic scaling and a real-time tracking engine.",
-    decisions: [
-      "Prioritized a highly observable logging system to debug physical supply chain anomalies.",
-      "Optimized the mobile frontend for low-connectivity environments commonly found in warehouses."
+    focus: [
+      "B2B2C platform design",
+      "Workforce control and accountability",
+      "Operational systems for asset-heavy businesses",
+      "Investor-readiness through technology"
     ],
-    challenges: "Adapting the data model to handle frequent shifts in business operations without breaking legacy data.",
-    outcome: "Reduced operational overhead by 40% through automation of manual distribution logic.",
-    lessons: "Technology must serve the operation. A perfect system that doesn't account for human error in the field is a broken system."
+    context:
+      "Frootify is an asset-backed consumer business transitioning from a walk-in retail model to a B2B2C, internet-enabled distribution system. The platform is being built to support scale, multi-location operations, workforce accountability, and operational visibility ahead of a major investment round.",
+    role:
+      "CTO / System Lead. Responsible for end-to-end technical strategy, platform architecture, and aligning system capabilities with business expansion and fundraising goals.",
+    architecture:
+      "Centralized operational platform designed around vendors rather than individual consumers. Supports multi-service-point vendors (chain businesses), role-based staff access, and centralized oversight. Includes admin and vendor dashboards, a staff mobile app, and a planned delivery/rider infrastructure to extend reach beyond physical locations.",
+    decisions: [
+      "Led the shift from a B2C-first approach to a B2B2C model to enable chain vendors, multiple service points, and scalable operations.",
+      "Redesigned the data model so a single vendor can operate multiple locations under unified control.",
+      "Introduced staff-level access controls to ensure all operational actors (vendors, staff, riders) operate within a single system of record.",
+      "Built a dedicated staff attendance system where attendance can only be marked on-premises, preventing remote or proxy check-ins.",
+      "Enforced location and device-bound attendance validation to ensure staff presence is verifiable and auditable.",
+      "Used AI-assisted workflows to rapidly prototype operational dashboards and internal tools, accelerating iteration under tight timelines."
+    ],
+    challenges:
+      "Designing systems that reflect real operational behavior — including staff movement, connectivity issues, and human error — while keeping the platform simple enough for non-technical users.",
+    outcome:
+      "Delivered a scalable operational foundation with centralized control over vendors, locations, and staff. Reduced ambiguity around workforce presence and laid the groundwork for disciplined expansion and investor confidence.",
+    lessons:
+      "In physical, asset-heavy businesses, trust is enforced through systems. Location-bound identity, workforce accountability, and clear operational controls matter more than feature richness. Scale comes from structure, not features — once operational authority and visibility are designed into the system, growth becomes a controllable process rather than a risk."
   },
+
   {
-    id: "brandseller",
-    name: "Brandseller",
-    url: "https://brandseller.co.uk/",
-    focus: ["Platform reliability", "Commercial system design", "Maintainability"],
-    context: "A commercial platform facilitating brand-to-consumer relationships with high uptime requirements.",
-    role: "Principal Engineer. Focused on stabilizing legacy bottlenecks and architecting for long-term growth.",
-    architecture: "Balanced stack focused on reliability. Load-balanced instances with a robust caching layer for high-read product catalogs.",
-    decisions: [
-      "Decoupled the ordering system from the inventory management to prevent inventory locks during high-traffic sales.",
-      "Integrated automated regression testing at the API level to ensure commercial logic integrity."
+    id: "circlify",
+    name: "Circlify",
+    url: "https://circlify.io",
+    focus: [
+      "Group-based financial systems",
+      "Authority-first onboarding",
+      "Cross-border compliance (UK & Nigeria)"
     ],
-    challenges: "Modernizing a live system with significant traffic while maintaining 99.9% availability.",
-    outcome: "Achieved a 60% reduction in system downtime and improved checkout conversion through faster response times.",
-    lessons: "Maintainability is a feature. Refactoring for clarity is as important as shipping new capabilities."
-  },
-  {
-    id: "atlax-exchange",
-    name: "Atlax Exchange",
-    url: "https://atlaxchange.com/",
-    focus: ["Fintech architecture", "Payment flows", "High-reliability backend"],
-    context: "High-performance exchange platform requiring sub-second transaction processing and absolute ledger correctness.",
-    role: "Backend Infrastructure Lead. Focused on the core transaction engine and security architecture.",
-    architecture: "Distributed system with a focus on transactional atomicity. Use of message queues (RabbitMQ) for order matching and asynchronous reconciliation.",
+    context:
+      "Circlify is a community finance platform built for UK diaspora groups and Nigerian cooperatives to manage rotating savings, contributions, and payouts. The system is designed around trust, authority, and transparency rather than individual user growth.",
+    role:
+      "Founder & System Architect. Owned the product from idea to production, including domain modeling, backend architecture, compliance decisions, and rollout strategy.",
+    architecture:
+      "Group-centric platform architecture where every action is scoped to a circle and governed by an admin authority. Backend services manage circle creation, member invitations, approvals, and contribution flows. The system enforces explicit state transitions to prevent unauthorized participation. Compliance-sensitive services are isolated to allow phased rollout across jurisdictions.",
     decisions: [
-      "Implemented double-entry bookkeeping at the database level to ensure fiscal integrity.",
-      "Designed a hardware-security-module (HSM) based approach for managing sensitive cryptographic keys."
+      "Designed the platform around circle admins as the primary authority, requiring explicit invite, approval, or rejection before any member can participate.",
+      "Implemented controlled onboarding flows to prevent anonymous or uncontrolled group access, prioritizing trust over rapid user acquisition.",
+      "Paused Nigerian rollout due to NDPR and data-provider constraints, choosing regulatory clarity over premature scale.",
+      "Evaluated alternative payment and data providers to replace Mono where compliance requirements could not be met.",
+      "Structured the platform to support community-level deployments rather than individual app signups."
     ],
-    challenges: "Managing high-throughput transaction spikes without introducing latency or race conditions in the ledger.",
-    outcome: "Processed millions in transaction volume with zero accounting discrepancies.",
-    lessons: "In fintech, 'eventual consistency' is often a liability. Aim for strong consistency in the core ledger and move everything else to the edge."
+    challenges:
+      "Balancing regulatory compliance across jurisdictions while maintaining a simple, trust-first experience for non-technical community leaders.",
+    outcome:
+      "Delivered a production-ready MVP capable of supporting managed community savings groups, with clear authority controls and auditable contribution flows. Established a compliant foundation for UK diaspora onboarding while preparing for Nigeria expansion.",
+    lessons:
+      "In group finance, trust is enforced through structure. Authority must come before users, and compliance must come before growth. Systems that ignore this fail quietly at scale."
   }
+
 ];
 
 export const BUILD_LOGS: BuildLog[] = [
   {
     title: "The Case for Modular Monoliths",
-    date: "2024-11-12",
-    excerpt: "Why microservices should be a result of scale, not a starting point.",
-    content: "In the early stages of Virtuosphere, the temptation to jump straight into microservices was high. However, we chose a modular monolith. Why? Reduced network latency, simplified deployment, and easier refactoring across domain boundaries. As the domains matured and team sizes grew, the boundaries we defined early allowed us to extract services with minimal friction."
-  },
-  {
-    title: "Surviving Payment Edge Cases",
-    date: "2024-09-05",
-    excerpt: "Lessons from building the Atlax Exchange ledgering system.",
-    content: "Network timeouts during payment capture are the bane of fintech. We implemented a robust idempotency-key strategy across all API calls. Every transaction attempt is logged before the external call, ensuring that even if the connection drops, we can safely retry or reconcile the state without double-charging."
-  },
-  {
-    title: "Designing for Observability",
-    date: "2024-07-20",
-    excerpt: "Moving beyond simple logs to structured telemetry.",
-    content: "Logs are useless if you can't query them. On Frootify, we moved to structured JSON logging and distributed tracing. Being able to follow a single request ID across four different services during a peak-load failure saved us hours of post-mortem analysis."
+    date: "2025-10-10",
+    excerpt:
+      "Written from experience building  — a multi-tenant institutional system operating under regulatory, operational, and hardware constraints.",
+    content:
+      "Early in Virtuosphere, the temptation to adopt microservices was strong. Instead, we chose a modular monolith. This allowed us to enforce clear domain boundaries, preserve transactional integrity, and operate with predictable latency in live institutional environments. By keeping services co-located but strictly modular, we reduced operational overhead, simplified deployments, and retained the ability to refactor safely as requirements evolved. As domains matured and usage scaled, the explicit boundaries defined early made later service extraction a refactoring exercise rather than a rewrite.",
+    url: "https://www.linkedin.com/feed/update/urn:li:activity:7382334959094771713"
   }
 ];

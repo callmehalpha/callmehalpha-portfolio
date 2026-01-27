@@ -18,6 +18,7 @@ export interface BuildLog {
   date: string;
   excerpt: string;
   content: string;
+  url: string;
 }
 
 export interface Capability {
