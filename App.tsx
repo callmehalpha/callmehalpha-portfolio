@@ -1,15 +1,15 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { 
-  Menu, 
-  X, 
-  ArrowRight, 
-  ChevronRight, 
-  Database, 
-  ShieldCheck, 
-  Cpu, 
-  CreditCard, 
-  Layout, 
+import {
+  Menu,
+  X,
+  ArrowRight,
+  ChevronRight,
+  Database,
+  ShieldCheck,
+  Cpu,
+  CreditCard,
+  Layout,
   ExternalLink,
   ChevronDown,
   Terminal,
@@ -68,7 +68,7 @@ const CapabilityCard = ({ capability }: { capability: Capability; key?: React.Ke
 
 const ArchitectureDiagramPlaceholder = ({ title }: { title: string }) => (
   <div className="w-full aspect-video bg-zinc-950 border border-zinc-800 rounded-lg flex flex-col items-center justify-center relative overflow-hidden group">
-    <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ 
+    <div className="absolute inset-0 opacity-10 pointer-events-none" style={{
       backgroundImage: 'radial-gradient(circle at 2px 2px, #3f3f46 1px, transparent 0)',
       backgroundSize: '24px 24px'
     }}></div>
@@ -82,7 +82,6 @@ const ArchitectureDiagramPlaceholder = ({ title }: { title: string }) => (
   </div>
 );
 
-// Added key?: React.Key to the props type to avoid "Property 'key' does not exist" error when mapping over CASE_STUDIES
 const CaseStudyCard = ({ study }: { study: CaseStudy; key?: React.Key }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isShareOpen, setIsShareOpen] = useState(false);
@@ -119,7 +118,7 @@ const CaseStudyCard = ({ study }: { study: CaseStudy; key?: React.Key }) => {
             <h3 className="text-xl md:text-2xl font-bold text-white group-hover:text-indigo-300 transition-colors line-clamp-1">{study.name}</h3>
           </div>
           <div className="relative" ref={shareRef}>
-            <button 
+            <button
               onClick={() => setIsShareOpen(!isShareOpen)}
               className="p-2 text-zinc-500 hover:text-white hover:bg-zinc-800 rounded-lg transition-colors"
               title="Share System Review"
@@ -128,7 +127,7 @@ const CaseStudyCard = ({ study }: { study: CaseStudy; key?: React.Key }) => {
             </button>
             {isShareOpen && (
               <div className="absolute right-0 top-full mt-2 w-48 bg-zinc-950 border border-zinc-800 rounded-xl shadow-2xl p-2 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
-                <button 
+                <button
                   onClick={handleCopyLink}
                   className="w-full flex items-center gap-3 px-3 py-2 text-xs text-zinc-400 hover:text-white hover:bg-zinc-900 rounded-lg transition-colors"
                 >
@@ -136,7 +135,7 @@ const CaseStudyCard = ({ study }: { study: CaseStudy; key?: React.Key }) => {
                   {copied ? "Link Copied" : "Copy Deep Link"}
                 </button>
                 <div className="h-px bg-zinc-800 my-1"></div>
-                <a 
+                <a
                   href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`}
                   target="_blank"
                   rel="noopener noreferrer"
@@ -144,7 +143,7 @@ const CaseStudyCard = ({ study }: { study: CaseStudy; key?: React.Key }) => {
                 >
                   <Twitter size={14} /> Share on X
                 </a>
-                <a 
+                <a
                   href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`}
                   target="_blank"
                   rel="noopener noreferrer"
@@ -166,8 +165,8 @@ const CaseStudyCard = ({ study }: { study: CaseStudy; key?: React.Key }) => {
           {study.focus.length > 2 && <span className="text-zinc-600 text-[10px] self-center">+{study.focus.length - 2}</span>}
         </div>
       </div>
-      
-      <button 
+
+      <button
         onClick={() => setIsExpanded(!isExpanded)}
         className="mt-auto flex items-center gap-2 text-indigo-400 hover:text-indigo-300 font-bold transition-colors text-[10px] uppercase tracking-widest group/btn"
       >
@@ -178,7 +177,7 @@ const CaseStudyCard = ({ study }: { study: CaseStudy; key?: React.Key }) => {
       {isExpanded && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-6 bg-black/90 backdrop-blur-sm animate-in fade-in duration-300">
           <div className="max-w-4xl w-full max-h-[90vh] overflow-y-auto bg-zinc-950 border border-zinc-800 rounded-2xl p-8 md:p-12 relative">
-            <button 
+            <button
               onClick={() => setIsExpanded(false)}
               className="absolute top-6 right-6 text-zinc-500 hover:text-white transition-colors"
             >
@@ -187,6 +186,9 @@ const CaseStudyCard = ({ study }: { study: CaseStudy; key?: React.Key }) => {
             <div className="mb-10">
               <span className="text-indigo-500 font-mono text-sm uppercase tracking-widest block mb-2">Technical Case Study</span>
               <h2 className="text-4xl font-bold text-white">{study.name}</h2>
+            </div>
+            <div className="mb-10">
+              <ArchitectureDiagramPlaceholder title={study.name} />
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
               <div>
@@ -244,6 +246,7 @@ const BuildLogEntry = ({ log }: { log: BuildLog; key?: React.Key }) => (
 
 export default function App() {
   const [activeNav, setActiveNav] = useState('hero');
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -267,13 +270,12 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] selection:bg-indigo-500/30 selection:text-indigo-200">
-      
+
       {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-[#0a0a0a]/80 backdrop-blur-md border-b border-zinc-900">
-        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-indigo-600 rounded flex items-center justify-center font-bold text-white">C</div>
-            <span className="font-mono text-sm tracking-tight text-white hidden sm:inline">CALLMEHALPHA</span>
+      <nav className="fixed top-4 left-6 right-6 z-50 bg-white/95 backdrop-blur-md border border-zinc-200 shadow-sm rounded-2xl">
+        <div className="max-w-7xl mx-auto px-6 h-32 pt-4 pb-2 md:py-4 flex items-center justify-between">
+          <div className="flex items-center gap-2 relative">
+            <img src="/logo.png" alt="CALLMEHALPHA Logo" className="h-40 w-auto py-2" />
           </div>
           <div className="hidden md:flex items-center gap-8">
             {[
@@ -282,17 +284,45 @@ export default function App() {
               { id: 'build-logs', label: 'Logs' },
               { id: 'contact', label: 'Contact' }
             ].map(item => (
-              <a 
+              <a
                 key={item.id}
                 href={`#${item.id}`}
-                className={`text-xs font-medium uppercase tracking-widest transition-colors ${activeNav === item.id ? 'text-indigo-400' : 'text-zinc-500 hover:text-zinc-300'}`}
+                className={`text-xs font-bold uppercase tracking-widest transition-colors ${activeNav === item.id ? 'text-indigo-600' : 'text-zinc-600 hover:text-black'}`}
               >
                 {item.label}
               </a>
             ))}
           </div>
-          <button className="md:hidden text-zinc-400"><Menu size={20} /></button>
+          <button
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            className="md:hidden text-zinc-800 p-2 hover:bg-zinc-100 rounded-lg transition-colors"
+          >
+            {isMenuOpen ? <X size={24} strokeWidth={2.5} /> : <Menu size={24} strokeWidth={2.5} />}
+          </button>
         </div>
+
+        {/* Mobile Menu Dropdown */}
+        {isMenuOpen && (
+          <div className="md:hidden border-t border-zinc-100 bg-white/95 backdrop-blur-md rounded-b-2xl overflow-hidden animate-in slide-in-from-top-2 duration-300">
+            <div className="flex flex-col p-6 gap-4">
+              {[
+                { id: 'case-studies', label: 'Case Studies' },
+                { id: 'capabilities', label: 'Capabilities' },
+                { id: 'build-logs', label: 'Logs' },
+                { id: 'contact', label: 'Contact' }
+              ].map(item => (
+                <a
+                  key={item.id}
+                  href={`#${item.id}`}
+                  onClick={() => setIsMenuOpen(false)}
+                  className={`text-sm font-bold uppercase tracking-widest transition-colors ${activeNav === item.id ? 'text-indigo-600' : 'text-zinc-600 hover:text-black'}`}
+                >
+                  {item.label}
+                </a>
+              ))}
+            </div>
+          </div>
+        )}
       </nav>
 
       {/* Hero Section */}
@@ -309,14 +339,14 @@ export default function App() {
             I design, build, and operate scalable software systems — from multi-tenant platforms to payment infrastructure — with a focus on correctness, ownership, and long-term maintainability.
           </p>
           <div className="flex flex-wrap gap-4 animate-in fade-in slide-in-from-bottom-10 duration-700 delay-500">
-            <a 
-              href="#case-studies" 
+            <a
+              href="#case-studies"
               className="bg-white text-black px-8 py-4 rounded font-bold flex items-center gap-2 transition-all duration-300 hover:bg-zinc-100 hover:scale-105 active:scale-[0.98] group"
             >
               View Case Studies <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
             </a>
-            <a 
-              href="#contact" 
+            <a
+              href="#contact"
               className="bg-zinc-900 text-white border border-zinc-800 px-8 py-4 rounded font-bold transition-all duration-300 hover:bg-black hover:border-zinc-600 hover:scale-105 active:scale-[0.98]"
             >
               Connect
@@ -353,9 +383,9 @@ export default function App() {
       <Section id="case-studies" title="Technical Case Studies" className="bg-zinc-950/30 overflow-hidden">
         <div className="flex overflow-x-auto snap-x snap-mandatory gap-6 pb-12 -mx-6 px-6 no-scrollbar">
           {CASE_STUDIES.map((study) => (
-            <CaseStudyCard 
-              key={study.id} 
-              study={study} 
+            <CaseStudyCard
+              key={study.id}
+              study={study}
             />
           ))}
         </div>
@@ -434,8 +464,8 @@ export default function App() {
               Available for senior engineering roles, system design advisory, and technical leadership.
             </p>
             <div className="flex flex-wrap gap-8">
-              <a 
-                href="mailto:hello@callmehalpha.tech" 
+              <a
+                href="mailto:hello@callmehalpha.tech"
                 className="flex items-center gap-3 text-white font-bold group focus:outline-none focus-visible:ring-2 focus-visible:ring-white/50 focus-visible:bg-white/5 rounded-xl transition-all p-2 -m-2"
               >
                 <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center group-hover:bg-white/30 group-focus-visible:bg-white/30 transition-colors">
@@ -443,8 +473,8 @@ export default function App() {
                 </div>
                 Email
               </a>
-              <a 
-                href="https://linkedin.com" 
+              <a
+                href="https://linkedin.com"
                 className="flex items-center gap-3 text-white font-bold group focus:outline-none focus-visible:ring-2 focus-visible:ring-white/50 focus-visible:bg-white/5 rounded-xl transition-all p-2 -m-2"
               >
                 <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center group-hover:bg-white/30 group-focus-visible:bg-white/30 transition-colors">
@@ -466,8 +496,8 @@ export default function App() {
             <span>SYSTEMS BUILDER</span>
           </div>
           <div className="flex items-center gap-4 text-zinc-600 font-mono text-[10px] uppercase">
-             <span>v2.4.0-STABLE</span>
-             <Terminal size={14} />
+            <span>v2.4.0-STABLE</span>
+            <Terminal size={14} />
           </div>
         </div>
       </footer>
