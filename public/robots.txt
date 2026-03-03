@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://abdulazeez.usaiy.xyz/sitemap.xml
