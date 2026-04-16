@@ -148,8 +148,8 @@ Write a tailored, ATS-optimized resume that:
     },
 
     images: {
-      cover: '/products/ai-job-kit/Gumroad_Cover_1280x720.png',
-      thumbnail: '/products/ai-job-kit/Gumroad_Thumbnail_600x600.png',
+      cover: '/product-assets/ai-job-kit/Gumroad_Cover_1280x720.png',
+      thumbnail: '/product-assets/ai-job-kit/Gumroad_Thumbnail_600x600.png',
     },
   },
 ];

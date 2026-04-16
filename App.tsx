@@ -692,6 +692,30 @@ const PortfolioPage = () => {
 };
 
 
+// --- Not Found Page ---
+const NotFoundPage = () => {
+  const navigate = useNavigate();
+  return (
+    <div className="min-h-screen bg-[#0a0a0a] flex flex-col items-center justify-center px-6 text-center">
+      <div className="mb-8">
+        <h1 className="text-8xl font-bold text-indigo-600 mb-4 tracking-tighter">404</h1>
+        <div className="h-1 w-24 bg-zinc-800 mx-auto"></div>
+      </div>
+      <h2 className="text-3xl font-bold text-white mb-4">System Path Not Found</h2>
+      <p className="text-zinc-500 max-w-md mb-12 leading-relaxed">
+        The requested architectural endpoint does not exist or has been decommissioned.
+      </p>
+      <button
+        onClick={() => navigate('/')}
+        className="bg-white text-black px-8 py-4 rounded font-bold transition-all duration-300 hover:bg-zinc-100 hover:scale-105 active:scale-[0.98]"
+      >
+        Return to Neutral Zone
+      </button>
+    </div>
+  );
+};
+
+
 // --- Main App Component (Router) ---
 
 export default function App() {
@@ -701,6 +725,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<PortfolioPage />} />
         <Route path="/products/:slug" element={<ProductView />} />
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </>
   );
