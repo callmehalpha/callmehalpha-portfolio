@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { SEO } from '../components/SEO';
 
 export const NotFound = () => {
   const navigate = useNavigate();
@@ -11,6 +12,12 @@ export const NotFound = () => {
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] flex flex-col items-center justify-center px-6 text-center font-mono">
+      <SEO 
+        data={{ 
+          title: "404 - System Path Not Found | Callmehalpha", 
+          description: "The requested architectural endpoint does not exist or has been decommissioned." 
+        }} 
+      />
       <div className="mb-8">
         <h1 className="text-8xl font-bold text-indigo-600 mb-4 tracking-tighter animate-pulse">404</h1>
         <div className="h-1 w-24 bg-zinc-800 mx-auto"></div>

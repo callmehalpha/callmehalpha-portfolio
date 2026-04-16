@@ -11,6 +11,7 @@ import {
   Star,
 } from 'lucide-react';
 import { Product } from '../types';
+import { SEO } from '../components/SEO';
 
 /* ─── Scroll-to-top on mount ─── */
 const useScrollTop = () => {
@@ -230,6 +231,7 @@ export const ProductPage = ({ product }: { product: Product }) => {
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] selection:bg-indigo-500/30 selection:text-indigo-200 overflow-x-hidden">
+      <SEO data={product.seo} />
 
       {/* ─── Sticky Nav Bar ─── */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-[#0a0a0a]/80 backdrop-blur-xl border-b border-zinc-800/50">

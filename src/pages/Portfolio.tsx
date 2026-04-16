@@ -11,6 +11,7 @@ import { CaseStudyCard } from '../components/CaseStudyCard';
 import { BuildLogEntry } from '../components/BuildLogEntry';
 import { ProductCard } from '../components/ProductCard';
 import { ProductCarousel } from '../components/ProductCarousel';
+import { SEO } from '../components/SEO';
 
 export const Portfolio = () => {
   const [activeNav, setActiveNav] = useState('hero');
@@ -54,6 +55,7 @@ export const Portfolio = () => {
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] selection:bg-indigo-500/30 selection:text-indigo-200">
+      <SEO />
       {/* Navigation */}
       <nav className="fixed top-4 left-6 right-6 z-50 bg-white/95 backdrop-blur-md border border-zinc-200 shadow-sm rounded-2xl">
         <div className="max-w-7xl mx-auto px-6 h-32 pt-4 pb-2 md:py-4 flex items-center justify-between">

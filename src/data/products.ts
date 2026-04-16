@@ -151,5 +151,11 @@ Write a tailored, ATS-optimized resume that:
       cover: '/product-assets/ai-job-kit/Gumroad_Cover_1280x720.png',
       thumbnail: '/product-assets/ai-job-kit/Gumroad_Thumbnail_600x600.png',
     },
+    seo: {
+      title: 'AI Job Hunter Kit | Land Interviews in 11 Days',
+      description: 'The plug-and-play AI prompt system engineered to help you bypass ATS filters and land your dream role. 53+ battle-tested prompts for every stage of the job search.',
+      keywords: ['AI Job Search', 'ATS Optimization', 'Resume Prompts', 'Interview Prep', 'Job Hunting Kit'],
+      image: 'https://abdulazeez.usaiy.xyz/product-assets/ai-job-kit/Gumroad_Cover_1280x720.png'
+    }
   },
 ];

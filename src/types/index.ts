@@ -68,6 +68,13 @@ export interface ProductFaq {
   answer: string;
 }
 
+export interface SeoData {
+  title?: string;
+  description?: string;
+  image?: string;
+  keywords?: string[];
+}
+
 export interface ProductFinalCta {
   headline: string;
   subtext: string;
@@ -96,4 +103,5 @@ export interface Product {
     cover: string;
     thumbnail: string;
   };
+  seo?: SeoData;
 }
