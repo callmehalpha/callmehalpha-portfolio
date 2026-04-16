@@ -272,7 +272,7 @@ const BuildLogEntry = ({ log }: { log: BuildLog; key?: React.Key }) => (
 
 // --- Product Card for Homepage ---
 
-const ProductCard = ({ product }: { product: typeof PRODUCTS[0] }) => {
+const ProductCard = ({ product }: { product: typeof PRODUCTS[0]; key?: React.Key }) => {
   return (
     <Link
       to={`/products/${product.slug}`}
