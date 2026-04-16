@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect, useRef } from 'react';
+import { Routes, Route, Link, useParams, useNavigate, useLocation } from 'react-router-dom';
 import {
   Menu,
   X,
@@ -19,12 +20,32 @@ import {
   Share2,
   Twitter,
   Copy,
-  Check
+  Check,
+  Package,
+  Sparkles,
 } from 'lucide-react';
 import { CASE_STUDIES, PHILOSOPHIES, CAPABILITIES, BUILD_LOGS } from './constants';
-import { CaseStudy, Capability, Philosophy, BuildLog } from './types';
+import { PRODUCTS } from './products';
+import { CaseStudy, Capability, Philosophy, BuildLog
+ } from './types';
+import ProductPage from './ProductPage';
 
-// --- Sub-components ---
+// --- Components & Helpers ---
+
+const ScrollToHash = () => {
+  const { hash } = useLocation();
+  useEffect(() => {
+    if (hash) {
+      const element = document.getElementById(hash.slice(1));
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
+    } else {
+      window.scrollTo(0, 0);
+    }
+  }, [hash]);
+  return null;
+};
 
 const Section = ({ id, title, children, className = "" }: { id: string, title?: string, children?: React.ReactNode, className?: string }) => (
   <section id={id} className={`py-24 px-6 md:px-12 max-w-7xl mx-auto scroll-mt-20 ${className}`}>
@@ -249,15 +270,162 @@ const BuildLogEntry = ({ log }: { log: BuildLog; key?: React.Key }) => (
   </div>
 );
 
-// --- Main App Component ---
+// --- Product Card for Homepage ---
 
-export default function App() {
+const ProductCard = ({ product }: { product: typeof PRODUCTS[0] }) => {
+  return (
+    <Link
+      to={`/products/${product.slug}`}
+      className="group relative bg-zinc-900/40 border border-zinc-800 rounded-2xl overflow-hidden hover:border-indigo-500/30 transition-all duration-300 hover:shadow-xl hover:shadow-indigo-500/5 flex flex-col"
+    >
+      {/* Product image */}
+      <div className="relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-t from-zinc-900 to-transparent z-10 opacity-40" />
+        <img
+          src={product.images.cover}
+          alt={product.name}
+          className="w-full aspect-video object-cover group-hover:scale-105 transition-transform duration-500"
+        />
+        {/* Price badge */}
+        <div className="absolute top-4 right-4 z-20 bg-black/70 backdrop-blur-sm border border-zinc-700 rounded-full px-4 py-1.5 flex items-center gap-2">
+          <span className="text-zinc-500 line-through text-xs">{product.originalPrice}</span>
+          <span className="text-white font-bold text-sm">{product.price}</span>
+        </div>
+      </div>
+
+      {/* Product info */}
+      <div className="p-8 flex-1 flex flex-col">
+        <div className="flex items-center gap-2 mb-3">
+          <Sparkles size={14} className="text-indigo-400" />
+          <span className="text-indigo-400 text-[10px] font-bold uppercase tracking-widest">Digital Product</span>
+        </div>
+        <h3 className="text-xl font-bold text-white mb-3 group-hover:text-indigo-300 transition-colors">
+          {product.name}
+        </h3>
+        <p className="text-zinc-400 text-sm leading-relaxed mb-6 line-clamp-2 flex-1">
+          {product.tagline}
+        </p>
+        <div className="flex items-center gap-2 text-indigo-400 text-[10px] font-bold uppercase tracking-widest group-hover:gap-3 transition-all">
+          View Product <ArrowRight size={14} />
+        </div>
+      </div>
+    </Link>
+  );
+};
+
+
+// --- Product Carousel (for homepage) ---
+const ProductCarousel = ({ children }: { children: React.ReactNode[] }) => {
+  const [index, setIndex] = useState(0);
+  const total = children.length;
+
+  // Sign (arrows) should be invisible if only 1 product
+  const showArrows = total > 1;
+
+  // Track window width for responsive card counts
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const scrollToIndex = (newIndex: number) => {
+    if (newIndex < 0 || newIndex >= total) return;
+    setIndex(newIndex);
+  };
+
+  const cardsPerPage = isMobile ? 1 : 3;
+
+  return (
+    <div className="relative group">
+      <div className="overflow-hidden px-4 -mx-4">
+        <div 
+          className="flex transition-transform duration-500 ease-[cubic-bezier(0.23,1,0.32,1)]"
+          style={{ transform: `translateX(-${index * (100 / cardsPerPage)}%)` }}
+        >
+          {children.map((child, i) => (
+            <div 
+              key={i} 
+              className={`shrink-0 px-4 ${isMobile ? 'w-full' : 'w-1/3'}`}
+            >
+              {child}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {showArrows && (
+        <>
+          <button
+            onClick={() => scrollToIndex(index - 1)}
+            disabled={index === 0}
+            className={`absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 w-12 h-12 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center text-white shadow-2xl transition-all ${index === 0 ? 'opacity-0 pointer-events-none' : 'opacity-0 group-hover:opacity-100'}`}
+          >
+            <ArrowRight size={20} className="rotate-180" strokeWidth={3} />
+          </button>
+          <button
+            onClick={() => scrollToIndex(index + 1)}
+            disabled={index >= total - cardsPerPage}
+            className={`absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 w-12 h-12 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center text-white shadow-2xl transition-all ${index >= total - cardsPerPage ? 'opacity-0 pointer-events-none' : 'opacity-0 group-hover:opacity-100'}`}
+          >
+            <ArrowRight size={20} strokeWidth={3} />
+          </button>
+        </>
+      )}
+      
+      {showArrows && (
+        <div className="flex justify-center gap-2 mt-10">
+          {Array.from({ length: Math.ceil(total / cardsPerPage) }).map((_, i) => (
+            <button
+              key={i}
+              onClick={() => setIndex(i)}
+              className={`h-1 rounded-full transition-all duration-300 ${i === index ? 'w-8 bg-indigo-500' : 'w-2 bg-zinc-800'}`}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+
+// --- Product View (Route Wrapper) ---
+
+const ProductView = () => {
+  const { slug } = useParams<{ slug: string }>();
+  const navigate = useNavigate();
+  const product = PRODUCTS.find(p => p.slug === slug);
+
+  if (!product) {
+    return (
+      <div className="min-h-screen bg-[#0a0a0a] flex flex-col items-center justify-center px-6">
+        <h1 className="text-4xl font-bold text-white mb-4">Product not found</h1>
+        <p className="text-zinc-400 mb-8">The product you're looking for doesn't exist.</p>
+        <button
+          onClick={() => navigate('/')}
+          className="text-indigo-400 hover:text-indigo-300 font-bold flex items-center gap-2"
+        >
+          ← Back to Portfolio
+        </button>
+      </div>
+    );
+  }
+
+  return <ProductPage product={product} />;
+};
+
+
+// --- Portfolio Page (existing homepage) ---
+
+const PortfolioPage = () => {
   const [activeNav, setActiveNav] = useState('hero');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
-      const sections = ['hero', 'philosophy', 'capabilities', 'case-studies', 'build-logs', 'operating', 'contact'];
+      const sections = ['hero', 'philosophy', 'capabilities', 'case-studies', 'build-logs', 'products', 'operating', 'contact'];
       const scrollPosition = window.scrollY + 100;
 
       for (const section of sections) {
@@ -275,6 +443,14 @@ export default function App() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  const navItems = [
+    { id: 'case-studies', label: 'Case Studies' },
+    { id: 'capabilities', label: 'Capabilities' },
+    { id: 'build-logs', label: 'Logs' },
+    { id: 'products', label: 'Products' },
+    { id: 'contact', label: 'Contact' },
+  ];
+
   return (
     <div className="min-h-screen bg-[#0a0a0a] selection:bg-indigo-500/30 selection:text-indigo-200">
 
@@ -285,15 +461,10 @@ export default function App() {
             <img src="/logo.png" alt="CALLMEHALPHA Logo" className="h-40 w-auto py-2" />
           </div>
           <div className="hidden md:flex items-center gap-8">
-            {[
-              { id: 'case-studies', label: 'Case Studies' },
-              { id: 'capabilities', label: 'Capabilities' },
-              { id: 'build-logs', label: 'Logs' },
-              { id: 'contact', label: 'Contact' }
-            ].map(item => (
+            {navItems.map(item => (
               <a
                 key={item.id}
-                href={`#${item.id}`}
+                href={`/#${item.id}`}
                 className={`text-xs font-bold uppercase tracking-widest transition-colors ${activeNav === item.id ? 'text-indigo-600' : 'text-zinc-600 hover:text-black'}`}
               >
                 {item.label}
@@ -312,15 +483,10 @@ export default function App() {
         {isMenuOpen && (
           <div className="md:hidden border-t border-zinc-100 bg-white/95 backdrop-blur-md rounded-b-2xl overflow-hidden animate-in slide-in-from-top-2 duration-300">
             <div className="flex flex-col p-6 gap-4">
-              {[
-                { id: 'case-studies', label: 'Case Studies' },
-                { id: 'capabilities', label: 'Capabilities' },
-                { id: 'build-logs', label: 'Logs' },
-                { id: 'contact', label: 'Contact' }
-              ].map(item => (
+              {navItems.map(item => (
                 <a
                   key={item.id}
-                  href={`#${item.id}`}
+                  href={`/#${item.id}`}
                   onClick={() => setIsMenuOpen(false)}
                   className={`text-sm font-bold uppercase tracking-widest transition-colors ${activeNav === item.id ? 'text-indigo-600' : 'text-zinc-600 hover:text-black'}`}
                 >
@@ -345,17 +511,17 @@ export default function App() {
           <p className="text-zinc-500 text-lg md:text-xl max-w-2xl mb-12 leading-relaxed animate-in fade-in slide-in-from-bottom-8 duration-700 delay-300">
             I work on systems where failure is expensive — finance, institutions, operations, and physical infrastructure.
             My focus is clarity: authority-first design, predictable architectures, and software that survives real usage.
-            I’ve led products from idea to production across education, payments, and operational platforms.
+            I've led products from idea to production across education, payments, and operational platforms.
           </p>
           <div className="flex flex-wrap gap-4 animate-in fade-in slide-in-from-bottom-10 duration-700 delay-500">
             <a
-              href="#case-studies"
+              href="/#case-studies"
               className="bg-white text-black px-8 py-4 rounded font-bold flex items-center gap-2 transition-all duration-300 hover:bg-zinc-100 hover:scale-105 active:scale-[0.98] group"
             >
               View Case Studies <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
             </a>
             <a
-              href="#contact"
+              href="/#contact"
               className="bg-zinc-900 text-white border border-zinc-800 px-8 py-4 rounded font-bold transition-all duration-300 hover:bg-black hover:border-zinc-600 hover:scale-105 active:scale-[0.98]"
             >
               Connect
@@ -413,6 +579,17 @@ export default function App() {
         <div className="mt-4 flex items-center gap-2 text-zinc-600 font-mono text-[10px] uppercase">
           <ArrowRight size={12} /> Scroll for technical deep dives
         </div>
+      </Section>
+
+      <Section id="products" title="Products">
+        <p className="text-zinc-400 text-lg mb-12 max-w-2xl -mt-6">
+          Tools and resources I've built to solve real problems — available for instant download.
+        </p>
+        <ProductCarousel>
+          {PRODUCTS.map((product) => (
+            <ProductCard key={product.slug} product={product} />
+          ))}
+        </ProductCarousel>
       </Section>
 
       {/* Operating Style */}
@@ -511,5 +688,20 @@ export default function App() {
         </div>
       </footer>
     </div>
+  );
+};
+
+
+// --- Main App Component (Router) ---
+
+export default function App() {
+  return (
+    <>
+      <ScrollToHash />
+      <Routes>
+        <Route path="/" element={<PortfolioPage />} />
+        <Route path="/products/:slug" element={<ProductView />} />
+      </Routes>
+    </>
   );
 }
