@@ -46,6 +46,16 @@ export const SEO = ({
     updateMetaTag(['meta[name="twitter:image"]', 'meta[property="twitter:image"]'], image);
     updateMetaTag(['meta[name="twitter:url"]', 'meta[property="twitter:url"]'], window.location.href);
 
+    // Update Canonical URL
+    const canonicalUrl = `https://abdulazeez.usaiy.xyz${window.location.pathname}`;
+    let canonicalLink = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
+    if (!canonicalLink) {
+      canonicalLink = document.createElement('link');
+      canonicalLink.setAttribute('rel', 'canonical');
+      document.head.appendChild(canonicalLink);
+    }
+    canonicalLink.setAttribute('href', canonicalUrl);
+
   }, [data, fallbackTitle, fallbackDescription]);
 
   return null; // This component doesn't render anything visually

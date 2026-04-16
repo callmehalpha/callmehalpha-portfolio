@@ -19,7 +19,7 @@ export const PRODUCTS: Product[] = [
     },
 
     problem: {
-      headline: 'Job searching in 2025 is broken.',
+      headline: 'Job searching in 2026 is broken.',
       intro: 'You know the drill:',
       painPoints: [
         'You spend hours tailoring each resume and never hear back',

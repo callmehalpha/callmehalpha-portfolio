@@ -113,6 +113,13 @@ const server = http.createServer((req, res) => {
 function injectSEO(html, seo, url) {
   const fullUrl = `https://abdulazeez.usaiy.xyz${url}`;
   
+  // Update or inject canonical link
+  if (html.includes('rel="canonical"')) {
+    html = html.replace(/href="https:\/\/abdulazeez\.usaiy\.xyz[^"]*"/, `href="${fullUrl}"`);
+  } else {
+    html = html.replace('</head>', `  <link rel="canonical" href="${fullUrl}">\n</head>`);
+  }
+
   return html
     .replace(/<title>(.*?)<\/title>/, `<title>${seo.title}</title>`)
     .replace(/<meta name="title" content="(.*?)">/, `<meta name="title" content="${seo.title}">`)
