@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -11,7 +10,7 @@ import {
   Shield,
   Star,
 } from 'lucide-react';
-import { Product } from './types';
+import { Product } from '../types';
 
 /* ─── Scroll-to-top on mount ─── */
 const useScrollTop = () => {
@@ -52,10 +51,19 @@ const FaqItem = ({
   key?: React.Key;
 }) => {
   const [isOpen, setIsOpen] = useState(false);
+  
+  const handleToggle = () => {
+    const newState = !isOpen;
+    setIsOpen(newState);
+    if (newState && window.umami) {
+      window.umami.track('faq_expand', { question });
+    }
+  };
+
   return (
     <div className="border border-zinc-800 rounded-xl overflow-hidden transition-all duration-300 hover:border-zinc-700">
       <button
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={handleToggle}
         className="w-full flex items-center justify-between p-6 text-left focus:outline-none group"
       >
         <span className="text-white font-semibold text-lg pr-4 group-hover:text-indigo-300 transition-colors">
@@ -80,30 +88,41 @@ const CtaButton = ({
   href,
   text,
   size = 'lg',
+  productName,
 }: {
   href: string;
   text: string;
   size?: 'lg' | 'md';
-}) => (
-  <a
-    href={href}
-    target="_blank"
-    rel="noopener noreferrer"
-    className={`
-      group relative inline-flex items-center gap-3 font-bold rounded-xl
-      bg-gradient-to-r from-indigo-600 to-indigo-500
-      text-white shadow-lg shadow-indigo-600/25
-      hover:shadow-xl hover:shadow-indigo-500/30
-      hover:scale-[1.02] active:scale-[0.98]
-      transition-all duration-300
-      ${size === 'lg' ? 'px-10 py-5 text-lg' : 'px-4 py-2 md:px-8 md:py-4 text-sm md:text-base'}
-    `}
-  >
-    <span className="absolute inset-0 rounded-xl bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-    <span className="relative">{text} →</span>
-    <ExternalLink size={size === 'lg' ? 20 : 16} className="relative opacity-60 group-hover:opacity-100 transition-opacity" />
-  </a>
-);
+  productName: string;
+}) => {
+  const handleCtaClick = () => {
+    if (window.umami) {
+      window.umami.track('product_cta_click', { product: productName, text, size });
+    }
+  };
+
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      onClick={handleCtaClick}
+      className={`
+        group relative inline-flex items-center gap-3 font-bold rounded-xl
+        bg-gradient-to-r from-indigo-600 to-indigo-500
+        text-white shadow-lg shadow-indigo-600/25
+        hover:shadow-xl hover:shadow-indigo-500/30
+        hover:scale-[1.02] active:scale-[0.98]
+        transition-all duration-300
+        ${size === 'lg' ? 'px-10 py-5 text-lg' : 'px-4 py-2 md:px-8 md:py-4 text-sm md:text-base'}
+      `}
+    >
+      <span className="absolute inset-0 rounded-xl bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+      <span className="relative">{text} →</span>
+      <ExternalLink size={size === 'lg' ? 20 : 16} className="relative opacity-60 group-hover:opacity-100 transition-opacity" />
+    </a>
+  );
+};
 
 /* ─── Section Wrapper ─── */
 const ProductSection = ({
@@ -200,9 +219,14 @@ const AutoplayCarousel = ({ children, interval = 4000 }: { children: React.React
    MAIN PRODUCT PAGE COMPONENT
    ═══════════════════════════════════════════════ */
 
-export default function ProductPage({ product }: { product: Product }) {
+export const ProductPage = ({ product }: { product: Product }) => {
   useScrollTop();
   const navigate = useNavigate();
+
+  const handleBackClick = () => {
+    window.umami?.track('product_back_click', { product: product.name });
+    navigate('/');
+  };
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] selection:bg-indigo-500/30 selection:text-indigo-200 overflow-x-hidden">
@@ -211,13 +235,13 @@ export default function ProductPage({ product }: { product: Product }) {
       <nav className="fixed top-0 left-0 right-0 z-50 bg-[#0a0a0a]/80 backdrop-blur-xl border-b border-zinc-800/50">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
           <button
-            onClick={() => navigate('/')}
+            onClick={handleBackClick}
             className="flex items-center gap-2 text-zinc-400 hover:text-white transition-colors text-sm font-medium group"
           >
             <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
             Back to Portfolio
           </button>
-          <CtaButton href={product.ctaUrl} text={product.ctaText} size="md" />
+          <CtaButton href={product.ctaUrl} text={product.ctaText} size="md" productName={product.name} />
         </div>
       </nav>
 
@@ -251,7 +275,7 @@ export default function ProductPage({ product }: { product: Product }) {
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4 mb-6">
-              <CtaButton href={product.ctaUrl} text={product.ctaText} size="lg" />
+              <CtaButton href={product.ctaUrl} text={product.ctaText} size="lg" productName={product.name} />
             </div>
 
             <p className="text-zinc-600 text-sm flex items-center gap-2">
@@ -526,7 +550,7 @@ export default function ProductPage({ product }: { product: Product }) {
                 </div>
 
                 <div className="mb-8">
-                  <CtaButton href={product.ctaUrl} text={`Get the ${product.name}`} size="lg" />
+                  <CtaButton href={product.ctaUrl} text={`Get the ${product.name}`} size="lg" productName={product.name} />
                 </div>
 
                 <div className="flex flex-wrap gap-4 mb-6">
@@ -565,7 +589,7 @@ export default function ProductPage({ product }: { product: Product }) {
       <footer className="py-8 px-6 border-t border-zinc-900">
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <button
-            onClick={() => navigate('/')}
+            onClick={handleBackClick}
             className="text-zinc-500 hover:text-white transition-colors text-sm flex items-center gap-2"
           >
             <ArrowLeft size={14} />
@@ -578,4 +602,6 @@ export default function ProductPage({ product }: { product: Product }) {
       </footer>
     </div>
   );
-}
+};
+
+export default ProductPage;

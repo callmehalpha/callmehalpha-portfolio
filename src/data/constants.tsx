@@ -1,5 +1,5 @@
 
-import { CaseStudy, BuildLog, Capability, Philosophy } from './types';
+import { CaseStudy, BuildLog, Capability, Philosophy } from '../types';
 
 export const PHILOSOPHIES: Philosophy[] = [
   { title: "Systems over features", description: "Functionality is transient; the integrity of the underlying system is what enables longevity." },
