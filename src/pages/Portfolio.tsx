@@ -112,12 +112,12 @@ export const Portfolio = () => {
             Callme<span className="text-zinc-600">halpha</span>
           </h1>
           <p className="text-2xl md:text-3xl font-medium text-zinc-400 mb-10 leading-snug animate-in fade-in slide-in-from-bottom-6 duration-700 delay-200">
-            I build systems where trust, scale, and real-world constraints matter.
+            I build high-integrity systems where trust, scale, and real-world constraints matter.
           </p>
           <p className="text-zinc-500 text-lg md:text-xl max-w-2xl mb-12 leading-relaxed animate-in fade-in slide-in-from-bottom-8 duration-700 delay-300">
-            I work on systems where failure is expensive — finance, institutions, operations, and physical infrastructure.
-            My focus is clarity: authority-first design, predictable architectures, and software that survives real usage.
-            I've led products from idea to production across education, payments, and operational platforms.
+            I design and build backend systems where failure is expensive — spanning fintech, SaaS, commerce, and compliance.
+            My focus is architectural clarity: authority-first design, transactional correctness, and software built to survive physical and regulatory constraints.
+            I've engineered 8+ production platforms including digital asset exchanges, cashless institutional payments, and multi-tenant architectures.
           </p>
           <div className="flex flex-wrap gap-4 animate-in fade-in slide-in-from-bottom-10 duration-700 delay-500">
             <a
