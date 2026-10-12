@@ -32,7 +32,7 @@ export class ApprovalsController {
     try {
       const result = await this.approvals.decideByToken(token ?? '');
       const title = result.decision === 'approve' ? 'Approved' : 'Rejected';
-      return res.type('html').send(resultPage(title, `The ${result.entity.type.replace(/_/g, ' ')} is now ${result.entity.status.toLowerCase().replace(/_/g, ' ')}.`));
+      return res.status(200).type('html').send(resultPage(title, `The ${result.entity.type.replace(/_/g, ' ')} is now ${result.entity.status.toLowerCase().replace(/_/g, ' ')}.`));
     } catch (err) {
       return this.fail(res, err);
     }

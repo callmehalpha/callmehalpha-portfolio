@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import { ContentStatus } from '@prisma/client';
+import { ContentStatus, Prisma } from '@prisma/client';
 import { assertTransition } from '../common/content-status';
 import { PrismaService } from '../prisma/prisma.service';
 
@@ -52,8 +52,20 @@ export class ContentPublisher {
   async apply(type: EntityType, id: string, action: ContentAction): Promise<{ type: EntityType; id: string; status: ContentStatus }> {
     const to = targetStatus(type, action);
     const from = await this.status(type, id);
-    if (from === to) return { type, id, status: to };
-    assertTransition(from, to);
+    const isRevision = type === 'case_study_revision' || type === 'profile_revision';
+
+    if (from === to) {
+      // Re-publishing an older published revision makes it current again: that's the rollback.
+      if (isRevision && to === 'PUBLISHED') await this.prisma.$transaction((tx) => this.makeCurrent(tx, type, id));
+      return { type, id, status: to };
+    }
+    // Approval publishes revisions directly, but still passes through APPROVED so the rules hold.
+    if (action === 'approve' && to === 'PUBLISHED') {
+      assertTransition(from, 'APPROVED');
+      assertTransition('APPROVED', to);
+    } else {
+      assertTransition(from, to);
+    }
 
     await this.prisma.$transaction(async (tx) => {
       switch (type) {
@@ -68,25 +80,52 @@ export class ContentPublisher {
         case 'oss_project':
           await tx.ossProject.update({ where: { id }, data: { status: to } });
           break;
-        case 'case_study_revision': {
-          const rev = await tx.caseStudyRevision.update({ where: { id }, data: { status: to } });
-          if (to === 'PUBLISHED') {
-            await tx.caseStudy.update({ where: { id: rev.caseStudyId }, data: { currentRevisionId: id } });
-          }
+        case 'case_study_revision':
+          await tx.caseStudyRevision.update({ where: { id }, data: { status: to } });
           break;
-        }
-        case 'profile_revision': {
-          const rev = await tx.profileRevision.update({ where: { id }, data: { status: to } });
-          if (to === 'PUBLISHED') {
-            await tx.profile.update({ where: { id: rev.profileId }, data: { currentRevisionId: id } });
-          }
+        case 'profile_revision':
+          await tx.profileRevision.update({ where: { id }, data: { status: to } });
           break;
-        }
         default:
           throw new BadRequestException(`Unknown entity type ${type as string}`);
       }
+      if (isRevision) {
+        if (to === 'PUBLISHED') await this.makeCurrent(tx, type, id);
+        else if (from === 'PUBLISHED') await this.fallBack(tx, type, id);
+      }
     });
     return { type, id, status: to };
+  }
+
+  private async makeCurrent(tx: Prisma.TransactionClient, type: EntityType, id: string) {
+    if (type === 'case_study_revision') {
+      const rev = await tx.caseStudyRevision.findUniqueOrThrow({ where: { id } });
+      await tx.caseStudy.update({ where: { id: rev.caseStudyId }, data: { currentRevisionId: id } });
+    } else {
+      const rev = await tx.profileRevision.findUniqueOrThrow({ where: { id } });
+      await tx.profile.update({ where: { id: rev.profileId }, data: { currentRevisionId: id } });
+    }
+  }
+
+  /** When the live revision is taken down, the newest other published revision takes its place (or none). */
+  private async fallBack(tx: Prisma.TransactionClient, type: EntityType, id: string) {
+    if (type === 'case_study_revision') {
+      const rev = await tx.caseStudyRevision.findUniqueOrThrow({ where: { id }, include: { currentOf: true } });
+      if (!rev.currentOf) return;
+      const next = await tx.caseStudyRevision.findFirst({
+        where: { caseStudyId: rev.caseStudyId, status: 'PUBLISHED', id: { not: id } },
+        orderBy: { version: 'desc' },
+      });
+      await tx.caseStudy.update({ where: { id: rev.caseStudyId }, data: { currentRevisionId: next?.id ?? null } });
+    } else {
+      const rev = await tx.profileRevision.findUniqueOrThrow({ where: { id }, include: { currentOf: true } });
+      if (!rev.currentOf) return;
+      const next = await tx.profileRevision.findFirst({
+        where: { profileId: rev.profileId, status: 'PUBLISHED', id: { not: id } },
+        orderBy: { version: 'desc' },
+      });
+      await tx.profile.update({ where: { id: rev.profileId }, data: { currentRevisionId: next?.id ?? null } });
+    }
   }
 
   private find(type: EntityType, id: string): Promise<{ status: ContentStatus } | null> {
