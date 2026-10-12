@@ -4,6 +4,8 @@
 >
 > v2 changes: decisions recorded (§14), the engine now feeds **three portfolio sections** (Technical Notes, Technical Case Studies, Open Source Projects), the Products section is retired, approval is a runtime toggle, and notifications are pluggable like publishing channels.
 >
+> v4 changes: SMTP comes from `.env` and the **backend sends email** (Mailpit for local testing); branding plan committed (`content-engine/persona/branding-plan.md`); positioning set to **Technical Product Builder**; first CV reconciliation done (`content-engine/seed/profile-v1-review.md`); resume variants start with **backend** and **full-stack**.
+>
 > v3 changes: **CV ingest** builds a structured, versioned **Profile** that drives the hero, capabilities, a new Experience section and SEO, positioned to sell me (§3.1, WF-06). Visitors can **download a resume generated on the server** from all approved data (§6.7, WF-07). Approval email address recorded (D10).
 
 ## 1. Goal
@@ -142,8 +144,8 @@ content-engine/
 │   ├── processed/
 │   └── failed/
 ├── storage/               # generated resumes, uploaded CVs (gitignored, volume)
-├── persona/               # committed: personality.md, branding-plan.md
-├── seed/                  # one-off import of current CASE_STUDIES / BUILD_LOGS
+├── persona/               # committed: branding-plan.md (done), personality.md (to write)
+├── seed/                  # one-off import of current CASE_STUDIES / BUILD_LOGS + profile-v1-review.md
 ├── backend/               # NestJS app
 │   ├── Dockerfile
 │   ├── prisma/schema.prisma
@@ -186,6 +188,7 @@ Same VPS as the portfolio. Caddy fronts everything, so the existing `node server
 | `n8n` | `n8nio/n8n:<pinned>` | `n8n.<domain>` via Caddy | `DB_TYPE=postgresdb`, `N8N_ENCRYPTION_KEY` (**persist & back up — losing it bricks all saved credentials**), `WEBHOOK_URL`, `N8N_EDITOR_BASE_URL`, `GENERIC_TIMEZONE`, `N8N_RUNNERS_ENABLED=true`. Volume `n8n_data`. Public HTTPS is needed for LinkedIn/X OAuth callbacks. |
 | `backend` | `backend/Dockerfile` (multi-stage, `node:22-alpine`, non-root) | `api.<domain>` via Caddy | Mounts `./inbox` and `./persona`. Runs `prisma migrate deploy` on start. Healthcheck `GET /health`. |
 | `gotenberg` | `gotenberg/gotenberg:8` | internal only | HTML → PDF with headless Chromium for the resume. Kept in its own container so Chromium stays out of the backend image and is isolated. |
+| `mailpit` *(dev only, in `docker-compose.override.yml`)* | `axllent/mailpit` | UI on `localhost:8025` | Catches every email locally (SMTP on `mailpit:1025`), so approval emails, links and resume attachments can be tested without sending real mail. |
 | `caddy` | `caddy:2-alpine` | 80/443 | Auto TLS. n8n editor behind basic auth / IP allowlist; `/webhook*` and OAuth callback stay reachable. Approval links hit the **backend**, not n8n. |
 | `portfolio` *(optional)* | built from repo root | `abdulazeez.usaiy.xyz` | Runs existing `npm run build && node server.mjs`. |
 
@@ -207,11 +210,21 @@ PUBLIC_API_URL=https://api.usaiy.xyz
 WATCH_POLL_INTERVAL_MS=5000
 GOTENBERG_URL=http://gotenberg:3000
 STORAGE_DIR=/data/storage
+
+# Email (production: your SMTP credentials; dev: Mailpit)
+SMTP_HOST=mailpit
+SMTP_PORT=1025
+SMTP_SECURE=false
+SMTP_USER=
+SMTP_PASS=
+MAIL_FROM="Callmehalpha Content Engine <no-reply@usaiy.xyz>"
 ```
 
 The approval email address is set on the `email` notifier row (`config.to`), not in env, so it can change at runtime.
 
-The approval gate is **not** an env var any more — it's a runtime setting (§6.4). LLM, GitHub, social and SMTP credentials live only in n8n.
+**Who sends email:** the backend, using `nodemailer` and the `SMTP_*` values above. Email HTML templates (approval, diff, failure, resume preview with the PDF attached) live in code next to the data they render, and SMTP credentials sit in `.env` with everything else. The n8n `notify.email` sub-workflow just calls `POST /internal/notify/email`. Other notifiers (Telegram, Slack) can still be pure n8n sub-workflows; the registry doesn't care which side sends.
+
+The approval gate is **not** an env var any more — it's a runtime setting (§6.4). LLM, GitHub and social credentials live only in n8n; SMTP lives in `.env` for the backend.
 
 ---
 
@@ -499,6 +512,7 @@ model PipelineRun {
 | GET | `/internal/channels?enabled=true`, `/internal/notifiers?enabled=true&event=` | Fan-out registries |
 | POST | `/internal/publications/claim` | Claim `(noteId, channelId)`; 409 if done |
 | PATCH | `/internal/publications/:id` | Record result |
+| POST | `/internal/notify/email` | Render an email template and send it via SMTP (used by `notify.email`) |
 | POST / PATCH | `/internal/runs` | Run tracking |
 
 **Approval links** (public, HMAC-signed, single-use, expiring): `GET /approve/:token` and `GET /reject/:token` render a tiny confirmation page; on confirm the backend marks the item and calls the n8n resume URL. A two-step confirm stops email link-scanners from auto-approving.
@@ -562,7 +576,7 @@ Visitors click **Download Resume** and get a PDF built on the server from everyt
 
 **Privacy:** the public resume uses only fields marked public in `ProfileRevision.privacy`. By default phone and street address are private; email, LinkedIn, GitHub, portfolio and city/country are public. A private "full" variant (with phone) can be built for me to send directly; it is never served on the public endpoint.
 
-**Variants (later):** `?variant=backend|fintech|leadership` — the same inputs, curated with a different emphasis. Each variant is its own build, made the same way.
+**Variants:** your existing CVs are already two variants (Backend Engineer and Full Stack Engineer), so those ship first: `?variant=backend` and `?variant=fullstack`. The site's Download button serves `default`, positioned as **Technical Product Builder**. More (`fintech`, `leadership`) can be added later; each variant is its own build, made the same way.
 
 ---
 
@@ -712,7 +726,7 @@ ELSE
   "subject": "…", "markdown": "…", "actions": [{ "label": "Approve", "url": "…" }] }
 ```
 
-`notify.email` ships first (SMTP credential in n8n; HTML email rendered from the markdown + action buttons). Telegram/Slack/WhatsApp later = one row + one sub-workflow, same as channels.
+`notify.email` ships first: an HTTP call to the backend's `POST /internal/notify/email`, which renders the template and sends via SMTP (Mailpit in dev). Telegram/Slack/WhatsApp later = one row + one sub-workflow, same as channels.
 
 ### WF-90 `system.error`
 
@@ -796,7 +810,7 @@ Why we did it, what broke, numbers…
 
 ## 11. Security & reliability
 
-- **Secrets**: `.env` gitignored; LLM/GitHub/social/SMTP keys only in n8n's encrypted store; back up `N8N_ENCRYPTION_KEY` separately.
+- **Secrets**: `.env` gitignored (holds DB, tokens and SMTP); LLM/GitHub/social keys only in n8n's encrypted store; back up `N8N_ENCRYPTION_KEY` separately.
 - **Network**: Postgres not published; n8n editor behind auth/IP allowlist; internal endpoints need the service token; admin endpoints a separate token.
 - **Approval links**: HMAC-signed, single-use, 7-day expiry, two-step confirm page (defeats email link pre-fetchers), entity + action bound into the signature.
 - **CV and personal data**: the original CV stays in `storage/cv/` and is never served; the public API and public resume only expose fields marked public; phone and street address are private by default. `/api/resume.pdf` serves a pre-built file only, rate-limited.
@@ -849,6 +863,9 @@ Why we did it, what broke, numbers…
 | — | Technical Notes become **portfolio-hosted posts** (not LinkedIn links) | `/notes/:slug`; existing note seeded (§6.6, §9) |
 | — | Products section → **Open Source Projects** with its own pipeline | `gen.oss` + `oss.sync`, new section (§7, §9) |
 | D10a | Approvals and alerts go to **abdulazeezyisau@gmail.com** | `email` notifier `config.to` (seeded, editable at runtime) |
+| D10b | **SMTP credentials in `.env`**, **Mailpit** for local testing | Backend sends email via nodemailer; `mailpit` in the dev override (§5) |
+| D13 | Positioning: **Technical Product Builder** (from the branding plan) | Site headline, `default` resume; `backend` / `fullstack` variants keep job titles for applications |
+| — | Branding plan committed | `content-engine/persona/branding-plan.md` |
 | — | **CV ingest** → versioned Profile, positioned with the branding plan | §3.1, WF-06; hero, Capabilities, Experience, JSON-LD from the Profile |
 | — | **Resume download**, built on the server from all approved data | §6.7, WF-07, Gotenberg service, `/api/resume.pdf` |
 
@@ -859,10 +876,10 @@ Why we did it, what broke, numbers…
 | D7 | `/products/ai-job-kit` is in the sitemap and likely linked from Gumroad/socials. Keep the route live (just not on the homepage), or remove it fully? | **Keep the route** + `server.mjs` SEO, drop it only from the homepage and nav |
 | D8 | Should an OSS contribution also produce a Technical Note + social post when blog-worthy? | **Yes**, through the normal approval |
 | D9 | Should case-study updates be announced on social? | **No** (`caseStudy.announce=false`); the note carries the news |
-| D10b | Which provider sends the emails? Gmail SMTP with an app password works to start; a transactional provider (Resend, Postmark, SES) on the `usaiy.xyz` domain is better for deliverability | **Gmail SMTP** to start, move to a provider later — it's just the n8n credential |
 | D11 | Case study order on the homepage: manual (`sortOrder`) or most recently updated first? | **Manual**, set via admin |
 | D12 | What can the public resume show? Phone number? City/country? | Email, LinkedIn, GitHub, portfolio, city/country **public**; phone and address **private** |
-| D13 | Who is the resume aimed at — the senior engineering roles, advisory and technical leadership in your current contact section? This sets the positioning and the first variant | **Yes**, one default variant aimed at those; more variants later |
+| D15 | The CV conflicts C1–C12 in `content-engine/seed/profile-v1-review.md` (Atlax title/dates, Vascon migration role, Frootify/DOKTA coverage, …) | Needed before Profile v1 is seeded |
+| D16 | Voice/tone for `personality.md`, and which audience comes first (hiring managers, founders, studio clients) | Needed before Phase 5 |
 | D14 | Keep the hand-written Philosophy and Operating Style sections as they are, or let the Profile manage them too? | **Keep hand-written** (they're brand voice, not CV data) |
 
 ---
@@ -871,7 +888,7 @@ Why we did it, what broke, numbers…
 
 | Phase | Scope | Exit criteria |
 |---|---|---|
-| **0. Prep** | Subdomains (`api.`, `n8n.`), LinkedIn dev app (`w_member_social`), X dev project, Gemini + OpenAI keys, GitHub token, SMTP provider + SPF/DKIM. First `persona/*.md`. | Accounts & keys ready |
+| **0. Prep** | Subdomains (`api.`, `n8n.`), LinkedIn dev app (`w_member_social`), X dev project, Gemini + OpenAI keys, GitHub token, SMTP credentials. ~~Branding plan~~ (done); `personality.md`; answer CV conflicts (D15). | Accounts & keys ready |
 | **1. Infra** | `docker-compose.yml`, Postgres (2 DBs), n8n on Postgres, NestJS `/health`, Caddy TLS in front of portfolio | All healthy over HTTPS |
 | **2. Backend core** | Prisma schema + migrations, ingest watcher (incl. CV text extraction), projects/notes/case-studies/OSS/profile/approvals/settings APIs, guards, **seed current case studies, note and profile**, channel + notifier rows | Seeded content served by `/api/*`; dropping a file creates a source and hits a test webhook; e2e tests green |
 | **3. Portfolio** | Notes pages + section, case studies from API, Open Source section replacing Products, hero/Capabilities from Profile, Experience section, `server.mjs` SEO for notes + JSON-LD, sitemap, static fallback | Homepage renders identical case studies from the API; seeded note opens on `/notes/…` with correct OG preview |
