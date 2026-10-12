@@ -9,7 +9,10 @@ dir="${1:?usage: restore.sh <backup-dir> [--yes]}"
 read -r -a COMPOSE <<< "${COMPOSE:-docker compose}"
 log() { echo "[$(date -u +%FT%TZ)] $*"; }
 
-[ -f "$dir/content.dump" ] && [ -f "$dir/n8n.dump" ] || { echo "Not a backup directory: $dir" >&2; exit 1; }
+if [ ! -f "$dir/content.dump" ] || [ ! -f "$dir/n8n.dump" ]; then
+  echo "Not a backup directory: $dir" >&2
+  exit 1
+fi
 (cd "$dir" && sha256sum --check --quiet SHA256SUMS) || { echo "Checksums don't match: refusing to restore" >&2; exit 1; }
 
 if [ "${2:-}" != "--yes" ]; then
