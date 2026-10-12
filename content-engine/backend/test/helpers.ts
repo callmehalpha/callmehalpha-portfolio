@@ -149,7 +149,7 @@ export async function createTestApp(opts: AppOptions = {}): Promise<TestContext>
 
   const moduleRef = await Test.createTestingModule({ imports: [AppModule] }).compile();
   moduleRef.get(PipelineClient).retryDelayMs = 1;
-  const app = configureApp(moduleRef.createNestApplication({ bodyParser: false }));
+  const app = configureApp(moduleRef.createNestApplication({ bodyParser: false, logger: false }));
   await app.init();
 
   const prisma = new PrismaClient({ datasources: { db: { url: databaseUrl() } } });

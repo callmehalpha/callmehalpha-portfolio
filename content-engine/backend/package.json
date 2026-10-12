@@ -11,9 +11,9 @@
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate deploy",
     "seed": "ts-node prisma/seed.ts",
-    "test": "jest",
-    "test:unit": "jest --selectProjects unit",
-    "test:e2e": "jest --selectProjects e2e --runInBand"
+    "test": "NODE_OPTIONS=--experimental-vm-modules jest --runInBand",
+    "test:unit": "NODE_OPTIONS=--experimental-vm-modules jest --selectProjects unit",
+    "test:e2e": "NODE_OPTIONS=--experimental-vm-modules jest --selectProjects e2e --runInBand"
   },
   "dependencies": {
     "@nestjs/common": "^11.2.7",
