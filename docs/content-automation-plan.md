@@ -3,6 +3,8 @@
 > Status: **Draft for review** · Owner: callmehalpha · Last updated: 2026-10-12
 >
 > v2 changes: decisions recorded (§14), the engine now feeds **three portfolio sections** (Technical Notes, Technical Case Studies, Open Source Projects), the Products section is retired, approval is a runtime toggle, and notifications are pluggable like publishing channels.
+>
+> v3 changes: **CV ingest** builds a structured, versioned **Profile** that drives the hero, capabilities, a new Experience section and SEO, positioned to sell me (§3.1, WF-06). Visitors can **download a resume generated on the server** from all approved data (§6.7, WF-07). Approval email address recorded (D10).
 
 ## 1. Goal
 
@@ -14,6 +16,10 @@ Drop a Markdown file (commit history, messages, notes from any project) into a f
 | **Technical Case Studies** (`#case-studies`) | Keeps a **living case study per project**, creating it for new projects and merging new work into existing ones | Five hard-coded entries in `CASE_STUDIES` |
 | **Open Source Projects** (replaces `#products`) | Keeps an entry per open-source project I build or contribute to, with my contributions and live GitHub stats | Products section with the AI Job Hunter Kit |
 | **LinkedIn, X (later Instagram, …)** | Posts a summary + link for each published note | Manual |
+| **Hero, Capabilities, Experience, SEO** | Builds them from my **CV + everything else in the system**, written to position me for the roles and clients I want | Hard-coded copy in `Portfolio.tsx` / `constants.tsx`; no Experience section |
+| **Resume download** | Generates an up-to-date PDF resume on the server from all approved data, re-built whenever that data changes | None |
+
+The overall goal: **sell me and grow my personal brand.** Every generator gets the branding plan as its brief, and the portfolio, the resume and the social posts all tell one consistent story.
 
 Everything is written from a personality / personal-branding Markdown I maintain, goes through **my approval by default** (toggleable), and notifies me by **email** (other notifiers pluggable later).
 
@@ -72,7 +78,7 @@ Rule of thumb: **NestJS knows *what* exists and *what happened*; n8n knows *how*
 
 ---
 
-## 3. Content model: one inbox, three outputs
+## 3. Content model: one inbox, many outputs
 
 The key change in v2: a dropped file is no longer "a blog post request". It is **new information about a project**, and a router decides which outputs it should update.
 
@@ -99,6 +105,26 @@ Every source doc belongs to a **Project** (`project:` slug in frontmatter, or in
 
 "Blog-worthy" is an LLM judgement with a reason, shown in the approval email so I can override it.
 
+### 3.1 The CV and the Profile
+
+A CV is a different kind of input: it's not about one project, it's about **me**. It goes into `inbox/cv/` (PDF, DOCX or Markdown) and produces a **Profile**, a single structured, versioned record of who I am professionally:
+
+- headline, positioning statement, summary, location, availability
+- experience (company, title, dates, location, impact bullets, linked projects)
+- skills (grouped by category, with the ones to lead with flagged)
+- education, certifications, awards, languages, links
+- headline stats ("8+ production platforms") with the evidence behind each
+
+The Profile is built from the CV and then **cross-checked against everything else in the system**: case studies, OSS entries and notes. So:
+
+- A role in the CV with no case study → a **draft case study is proposed** for that project.
+- A case study or OSS contribution that isn't reflected in the CV → its strongest points are proposed as experience bullets.
+- Stats are only shown when something in the system backs them up.
+
+Then a **positioning pass** rewrites the headline, summary and bullets against the branding plan: impact first, quantified where the sources allow, aimed at the audience in the branding plan. It never adds employers, titles, dates or numbers that aren't in a source. Every Profile revision goes through approval with a field-by-field diff, like case studies.
+
+The approved Profile drives the hero, Capabilities, a new **Experience** section, structured data for SEO, and the resume.
+
 ---
 
 ## 4. Repository layout
@@ -112,8 +138,10 @@ content-engine/
 ├── .env.example
 ├── Caddyfile
 ├── inbox/                 # drop *.md here (gitignored)
+│   ├── cv/                # drop CV here: .pdf | .docx | .md
 │   ├── processed/
 │   └── failed/
+├── storage/               # generated resumes, uploaded CVs (gitignored, volume)
 ├── persona/               # committed: personality.md, branding-plan.md
 ├── seed/                  # one-off import of current CASE_STUDIES / BUILD_LOGS
 ├── backend/               # NestJS app
@@ -126,6 +154,8 @@ content-engine/
 │       ├── notes/         # Technical Notes
 │       ├── case-studies/  # living case studies + revisions
 │       ├── oss/           # Open Source Projects + contributions
+│       ├── profile/       # CV parsing, versioned Profile
+│       ├── resume/        # resume templates, PDF rendering, download endpoint
 │       ├── approvals/     # generic approval items + signed links
 │       ├── settings/      # runtime toggles (approval gate, …)
 │       ├── channels/      # publishing mediums registry
@@ -155,6 +185,7 @@ Same VPS as the portfolio. Caddy fronts everything, so the existing `node server
 | `postgres` | `postgres:16-alpine` | internal only | Two databases: `content` (NestJS) and `n8n`, separate users. Volume `pgdata`. |
 | `n8n` | `n8nio/n8n:<pinned>` | `n8n.<domain>` via Caddy | `DB_TYPE=postgresdb`, `N8N_ENCRYPTION_KEY` (**persist & back up — losing it bricks all saved credentials**), `WEBHOOK_URL`, `N8N_EDITOR_BASE_URL`, `GENERIC_TIMEZONE`, `N8N_RUNNERS_ENABLED=true`. Volume `n8n_data`. Public HTTPS is needed for LinkedIn/X OAuth callbacks. |
 | `backend` | `backend/Dockerfile` (multi-stage, `node:22-alpine`, non-root) | `api.<domain>` via Caddy | Mounts `./inbox` and `./persona`. Runs `prisma migrate deploy` on start. Healthcheck `GET /health`. |
+| `gotenberg` | `gotenberg/gotenberg:8` | internal only | HTML → PDF with headless Chromium for the resume. Kept in its own container so Chromium stays out of the backend image and is isolated. |
 | `caddy` | `caddy:2-alpine` | 80/443 | Auto TLS. n8n editor behind basic auth / IP allowlist; `/webhook*` and OAuth callback stay reachable. Approval links hit the **backend**, not n8n. |
 | `portfolio` *(optional)* | built from repo root | `abdulazeez.usaiy.xyz` | Runs existing `npm run build && node server.mjs`. |
 
@@ -174,7 +205,11 @@ APPROVAL_LINK_SECRET=          # HMAC for one-click approve/reject links
 PUBLIC_SITE_URL=https://abdulazeez.usaiy.xyz
 PUBLIC_API_URL=https://api.usaiy.xyz
 WATCH_POLL_INTERVAL_MS=5000
+GOTENBERG_URL=http://gotenberg:3000
+STORAGE_DIR=/data/storage
 ```
+
+The approval email address is set on the `email` notifier row (`config.to`), not in env, so it can change at runtime.
 
 The approval gate is **not** an env var any more — it's a runtime setting (§6.4). LLM, GitHub, social and SMTP credentials live only in n8n.
 
@@ -184,7 +219,7 @@ The approval gate is **not** an env var any more — it's a runtime setting (§6
 
 ### 6.1 Stack
 
-NestJS 11, TypeScript, **Prisma**, `class-validator`, `@nestjs/throttler`, `chokidar` (`usePolling: true`), `gray-matter`, `pino`, `@nestjs/terminus`. Markdown stored as Markdown; rendered and sanitized on the frontend.
+NestJS 11, TypeScript, **Prisma**, `class-validator` + `zod` (Profile JSON validation), `@nestjs/throttler`, `chokidar` (`usePolling: true`), `gray-matter`, `pdf-parse` / `mammoth` (CV text extraction from PDF / DOCX), `handlebars` (resume templates), `pino`, `@nestjs/terminus`. Markdown stored as Markdown; rendered and sanitized on the frontend.
 
 ### 6.2 Data model
 
@@ -318,10 +353,49 @@ model OssContribution {
   summary      String?
 }
 
+// ── Profile (from CV + system) and Resume ───────────────────────
+model Profile {                                // singleton: me
+  id                String  @id @default("me")
+  currentRevisionId String? @unique
+  revisions         ProfileRevision[]
+}
+
+model ProfileRevision {
+  id         String        @id @default(cuid())
+  profileId  String
+  profile    Profile       @relation(fields: [profileId], references: [id])
+  version    Int
+  data       Json          // validated with zod; shape extends JSON Resume (basics, work,
+                           // education, skills, certificates, awards, languages, projects)
+                           // plus: positioning, heroStats[{label, value, evidence}],
+                           // capabilities[], leadSkills[]
+  privacy    Json          // per-field visibility: { phone: "private", email: "public", … }
+  changelog  String
+  sourceIds  String[]      // CV upload(s) + docs used
+  llmMeta    Json?
+  status     ContentStatus @default(DRAFT)
+  createdAt  DateTime      @default(now())
+  @@unique([profileId, version])
+}
+
+model ResumeBuild {
+  id            String        @id @default(cuid())
+  variant       String        @default("default")   // later: "backend", "fintech", …
+  contentHash   String                               // hash of every input → skip identical rebuilds
+  curated       Json                                 // selected + ordered content that was rendered
+  pdfPath       String?
+  jsonPath      String?                              // JSON Resume export
+  status        ContentStatus @default(DRAFT)
+  inputs        Json                                 // profile revision + case study / OSS versions used
+  createdAt     DateTime      @default(now())
+  publishedAt   DateTime?
+  @@unique([variant, contentHash])
+}
+
 // ── Approvals, settings, delivery ───────────────────────────────
 model ApprovalItem {
   id          String   @id @default(cuid())
-  entityType  String                           // note | case_study_revision | oss_project
+  entityType  String                           // note | case_study_revision | oss_project | profile_revision | resume_build
   entityId    String
   status      String   @default("PENDING")     // PENDING | APPROVED | REJECTED | EXPIRED
   resumeUrl   String?                          // n8n Wait-node resume URL
@@ -394,6 +468,9 @@ model PipelineRun {
 | GET | `/api/case-studies` | Technical Case Studies (current approved revision per visible project, in `sortOrder`) |
 | GET | `/api/case-studies/:slug` | Deep link / future dedicated page |
 | GET | `/api/oss` | Open Source Projects (with latest contributions + GitHub stats) |
+| GET | `/api/profile` | Hero, Capabilities, Experience, JSON-LD `Person` (public fields only) |
+| GET | `/api/resume.pdf?variant=` | **Resume download** — latest published build, `ETag` + `Content-Disposition: attachment` |
+| GET | `/api/resume.json` | Same content in JSON Resume format |
 | GET | `/api/feed.xml`, `/api/sitemap-notes.xml` | RSS, SEO |
 
 **Internal** (n8n only, bearer `INTERNAL_SERVICE_TOKEN`):
@@ -412,6 +489,11 @@ model PipelineRun {
 | PUT | `/internal/oss/:projectSlug` | Upsert OSS entry (draft) |
 | POST | `/internal/oss/:projectSlug/contributions` | Upsert contributions (by URL) |
 | PATCH | `/internal/oss/:projectSlug/stats` | GitHub stats sync |
+| GET | `/internal/cv/:sourceId/text` | Extracted CV text (backend does PDF/DOCX → text) |
+| GET | `/internal/profile` | Current revision (merge input) |
+| POST | `/internal/profile/revisions` | New draft Profile revision |
+| GET | `/internal/resume/inputs` | Everything approved (profile, case studies, OSS, recent notes) + its content hash |
+| POST | `/internal/resume/builds` | Store curated content → backend renders PDF via Gotenberg → returns preview URL |
 | POST | `/internal/approvals` | Register approval item + n8n resume URL → returns signed approve/reject links |
 | GET | `/internal/settings` | Approval toggles, etc. |
 | GET | `/internal/channels?enabled=true`, `/internal/notifiers?enabled=true&event=` | Fan-out registries |
@@ -431,6 +513,8 @@ Runtime settings, default **on**, granular so I can relax one output without the
 approval.required.note             = true
 approval.required.case_study       = true
 approval.required.oss              = true
+approval.required.profile          = true
+approval.required.resume           = true
 approval.required.social           = false   # social copy rides with the note's approval
 ```
 
@@ -445,12 +529,40 @@ Flip with `PATCH /admin/settings/approval.required.note {"value": false}` — no
 
 `persona/` changes create a new `PersonaDocument` version and trigger `persona.distill`.
 
+Files in `inbox/cv/` follow the same steps, but the backend also extracts the text (PDF/DOCX → text), keeps the original in `storage/cv/`, and triggers `gen.profile` instead of the router. The original CV is never served publicly.
+
 ### 6.6 Seeding today's content
 
 One-off `seed/` script (Phase 2):
 
 - The five `CASE_STUDIES` → `Project(kind=CLIENT|PRODUCT)` + `CaseStudy` revision v1 `PUBLISHED`. This gives the merge step a baseline, so new docs extend these rather than rewrite them.
 - The one `BUILD_LOGS` entry ("The Case for Modular Monoliths") → a `Note` `PUBLISHED` with its existing LinkedIn URL stored as a `Publication(channel=linkedin, PUBLISHED)`. The card now opens `/notes/the-case-for-modular-monoliths` instead of LinkedIn.
+- Current hero copy, `CAPABILITIES` and `PHILOSOPHIES` → Profile revision v1 `PUBLISHED`, so the site looks the same until the first CV is approved.
+
+### 6.7 Resume generation
+
+Visitors click **Download Resume** and get a PDF built on the server from everything approved in the system.
+
+**Build, don't render per request.** A build runs when its inputs change, not when someone clicks:
+
+1. Any approval of a Profile, case study or OSS revision emits `content.changed`.
+2. After a 10-minute debounce (so a burst of approvals makes one build), `gen.resume` (WF-07) runs.
+3. The backend hashes all inputs. Same hash as the last published build → nothing to do.
+4. The LLM curates the content (§7, WF-07); the backend fills a Handlebars HTML template; **Gotenberg** turns it into a PDF; the PDF and a JSON Resume export go to `storage/resume/<build-id>.*`.
+5. After approval (default on; the email has the PDF attached), the build becomes the published one.
+
+`GET /api/resume.pdf` just streams the published file, so it's fast, cacheable and can't be used to make the server run Chromium or the LLM on demand. The file is named `Abdulazeez-Yisau-Resume-<yyyy-mm>.pdf`.
+
+**Template rules** (applicant tracking systems read these files before people do):
+
+- One column, real selectable text, standard section headings, no text in images, no tables for layout.
+- Two pages max; curation decides what fits.
+- Every case study / OSS line links back to the portfolio page, so the resume sends readers back to the site.
+- Template versioned in `backend/src/resume/templates/`, styled with print CSS; the same HTML is shown as a preview in the approval email.
+
+**Privacy:** the public resume uses only fields marked public in `ProfileRevision.privacy`. By default phone and street address are private; email, LinkedIn, GitHub, portfolio and city/country are public. A private "full" variant (with phone) can be built for me to send directly; it is never served on the public endpoint.
+
+**Variants (later):** `?variant=backend|fintech|leadership` — the same inputs, curated with a different emphasis. Each variant is its own build, made the same way.
 
 ---
 
@@ -524,6 +636,39 @@ Resolve repo (frontmatter repo / project.repoUrl)
 ```
 
 **WF-04b `oss.sync`** (daily cron): refresh `githubStats` and pull newly merged PRs for every OSS project. Stats update silently; *new contributions* create a draft update and go through approval (and optionally become a note).
+
+### WF-06 `gen.profile` — CV → Profile
+
+```
+Webhook(sourceId of a CV)
+ → GET extracted CV text, current Profile, persona context
+ → GET all approved case studies, OSS entries, recent notes
+ → [LLM Extract]   CV → structured JSON (JSON Resume shape), no rewriting yet
+ → [LLM Reconcile] merge with current Profile and cross-check against the system:
+                   CV is authoritative for employers, titles and dates;
+                   flags roles with no case study → propose draft case studies;
+                   flags system evidence missing from the CV → propose bullets;
+                   heroStats only with evidence
+ → [LLM Position]  rewrite headline, summary, capabilities, bullets against the
+                   branding plan (impact first, quantified only from sources)
+ → [LLM Review]    grounding: every claim traced to the CV or a system record
+ → POST profile revision (DRAFT) (+ draft case studies for uncovered roles, each with its own approval)
+ → approval.gate (WF-10) — field diff + list of proposed case studies
+ → on approve: current revision → emit content.changed
+```
+
+### WF-07 `gen.resume` — server-built resume
+
+```
+Trigger: content.changed (debounced 10 min) | manual (admin) | template change
+ → GET /internal/resume/inputs (+ contentHash) → same as last published? stop
+ → [LLM Curate]  pick and order what fits 2 pages for the variant:
+                 strongest bullets per role, 3–4 case studies, top OSS work,
+                 skills grouped; tighten wording; no new claims
+ → POST /internal/resume/builds → backend renders HTML → Gotenberg → PDF
+ → approval.gate (WF-10) — email has the PDF attached
+ → on approve: publish build → /api/resume.pdf serves it
+```
 
 ### WF-05 `pub.fanout` — social
 
@@ -611,6 +756,10 @@ A third, lighter seam: **new content outputs** (e.g. a "Talks" or "Now" section 
 | 7 | SEO: `server.mjs` injects title/description/OG for `/notes/:slug` by fetching the note's SEO from the API (in-memory cache), so LinkedIn/X previews are correct | `server.mjs` |
 | 8 | Sitemap: add `/notes` pages via the API's `sitemap-notes.xml` (sitemap index) | `public/sitemap.xml` / `public/robots.txt` |
 | 9 | Remove static `CASE_STUDIES` / `BUILD_LOGS` from runtime once seeded — keep a trimmed copy only as the offline fallback | `src/data/constants.tsx` |
+| 10 | **Hero + Capabilities from the Profile**: headline, positioning, summary, hero stats and capability cards come from `/api/profile` (static fallback = today's copy) | `src/pages/Portfolio.tsx`, `src/components/CapabilityCard.tsx` |
+| 11 | New **Experience** section: timeline of roles with impact bullets, each linking to its case study when one exists | `src/pages/Portfolio.tsx`, `src/components/ExperienceTimeline.tsx` |
+| 12 | **Download Resume** button in the hero, nav and contact section → `/api/resume.pdf`; tracked with `umami.track('resume_download', { location })` | `src/pages/Portfolio.tsx` |
+| 13 | JSON-LD `Person` structured data (name, job title, `sameAs` LinkedIn/GitHub/X, `knowsAbout` lead skills) injected by `server.mjs` from the Profile, so search engines show a proper profile result | `server.mjs`, `src/components/SEO.tsx` |
 
 ---
 
@@ -650,6 +799,7 @@ Why we did it, what broke, numbers…
 - **Secrets**: `.env` gitignored; LLM/GitHub/social/SMTP keys only in n8n's encrypted store; back up `N8N_ENCRYPTION_KEY` separately.
 - **Network**: Postgres not published; n8n editor behind auth/IP allowlist; internal endpoints need the service token; admin endpoints a separate token.
 - **Approval links**: HMAC-signed, single-use, 7-day expiry, two-step confirm page (defeats email link pre-fetchers), entity + action bound into the signature.
+- **CV and personal data**: the original CV stays in `storage/cv/` and is never served; the public API and public resume only expose fields marked public; phone and street address are private by default. `/api/resume.pdf` serves a pre-built file only, rate-limited.
 - **Untrusted text**: commit messages, GitHub content and LLM output are data, not instructions — delimited in prompts; review steps check claims against sources; frontend sanitizes Markdown.
 - **Idempotency**: unique `(noteId, channelId)` claims; OSS contributions keyed by URL; case-study revisions versioned (rollback = point `currentRevisionId` back).
 - **Retries**: node-level retry with backoff; backend sweeper for stuck sources.
@@ -667,6 +817,8 @@ Why we did it, what broke, numbers…
 | GitHub API rate limits (5k/h with token) | OSS sync stalls | Daily sync, conditional requests (ETag), one token. |
 | LLM rewriting a case study and dropping or inventing facts | Reputation | Merge rules + grounding review + field diff in approval email + versioned revisions with rollback. |
 | Email deliverability (approval emails in spam) | Approvals stall | Transactional SMTP provider with SPF/DKIM on the domain; day-3 reminder; admin API fallback. |
+| LLM over-selling in the Profile or resume (inflated titles, made-up numbers) | Credibility with recruiters and clients | CV is authoritative for employers/titles/dates; every claim traced to a source in the review step; stats need evidence; diff + PDF in the approval email. |
+| CV parsing errors (two-column PDFs, odd layouts) | Wrong or missing experience | Extract step outputs JSON for review; DOCX/Markdown CV recommended; fix by editing the draft before approving. |
 | Instagram needs Business account + Facebook Page + Meta app review | Can't be text-only | `requiresMedia` + media step. |
 | n8n major upgrades | Broken workflows | Pin image tag; exported workflows as rollback. |
 
@@ -696,6 +848,9 @@ Why we did it, what broke, numbers…
 | — | Case studies **auto-update per project** | Projects first-class; `gen.case-study` living revisions (§3, WF-03) |
 | — | Technical Notes become **portfolio-hosted posts** (not LinkedIn links) | `/notes/:slug`; existing note seeded (§6.6, §9) |
 | — | Products section → **Open Source Projects** with its own pipeline | `gen.oss` + `oss.sync`, new section (§7, §9) |
+| D10a | Approvals and alerts go to **abdulazeezyisau@gmail.com** | `email` notifier `config.to` (seeded, editable at runtime) |
+| — | **CV ingest** → versioned Profile, positioned with the branding plan | §3.1, WF-06; hero, Capabilities, Experience, JSON-LD from the Profile |
+| — | **Resume download**, built on the server from all approved data | §6.7, WF-07, Gotenberg service, `/api/resume.pdf` |
 
 ### Still open
 
@@ -704,8 +859,11 @@ Why we did it, what broke, numbers…
 | D7 | `/products/ai-job-kit` is in the sitemap and likely linked from Gumroad/socials. Keep the route live (just not on the homepage), or remove it fully? | **Keep the route** + `server.mjs` SEO, drop it only from the homepage and nav |
 | D8 | Should an OSS contribution also produce a Technical Note + social post when blog-worthy? | **Yes**, through the normal approval |
 | D9 | Should case-study updates be announced on social? | **No** (`caseStudy.announce=false`); the note carries the news |
-| D10 | Which email address receives approvals, and which SMTP provider (e.g. Resend, Postmark, SES, Gmail SMTP)? | Needed before Phase 4 |
+| D10b | Which provider sends the emails? Gmail SMTP with an app password works to start; a transactional provider (Resend, Postmark, SES) on the `usaiy.xyz` domain is better for deliverability | **Gmail SMTP** to start, move to a provider later — it's just the n8n credential |
 | D11 | Case study order on the homepage: manual (`sortOrder`) or most recently updated first? | **Manual**, set via admin |
+| D12 | What can the public resume show? Phone number? City/country? | Email, LinkedIn, GitHub, portfolio, city/country **public**; phone and address **private** |
+| D13 | Who is the resume aimed at — the senior engineering roles, advisory and technical leadership in your current contact section? This sets the positioning and the first variant | **Yes**, one default variant aimed at those; more variants later |
+| D14 | Keep the hand-written Philosophy and Operating Style sections as they are, or let the Profile manage them too? | **Keep hand-written** (they're brand voice, not CV data) |
 
 ---
 
@@ -715,10 +873,11 @@ Why we did it, what broke, numbers…
 |---|---|---|
 | **0. Prep** | Subdomains (`api.`, `n8n.`), LinkedIn dev app (`w_member_social`), X dev project, Gemini + OpenAI keys, GitHub token, SMTP provider + SPF/DKIM. First `persona/*.md`. | Accounts & keys ready |
 | **1. Infra** | `docker-compose.yml`, Postgres (2 DBs), n8n on Postgres, NestJS `/health`, Caddy TLS in front of portfolio | All healthy over HTTPS |
-| **2. Backend core** | Prisma schema + migrations, ingest watcher, projects/notes/case-studies/OSS/approvals/settings APIs, guards, **seed current case studies + note**, channel + notifier rows | Seeded content served by `/api/*`; dropping a file creates a source and hits a test webhook; e2e tests green |
-| **3. Portfolio** | Notes pages + section, case studies from API, Open Source section replacing Products, `server.mjs` SEO for notes, sitemap, static fallback | Homepage renders identical case studies from the API; seeded note opens on `/notes/…` with correct OG preview |
+| **2. Backend core** | Prisma schema + migrations, ingest watcher (incl. CV text extraction), projects/notes/case-studies/OSS/profile/approvals/settings APIs, guards, **seed current case studies, note and profile**, channel + notifier rows | Seeded content served by `/api/*`; dropping a file creates a source and hits a test webhook; e2e tests green |
+| **3. Portfolio** | Notes pages + section, case studies from API, Open Source section replacing Products, hero/Capabilities from Profile, Experience section, `server.mjs` SEO for notes + JSON-LD, sitemap, static fallback | Homepage renders identical case studies from the API; seeded note opens on `/notes/…` with correct OG preview |
 | **4. Approvals + email** | WF-10 approval gate, signed links + confirm page, `notify.dispatch` + `notify.email`, WF-90 errors, settings toggles | Approve/reject a test draft from email; toggle off skips the gate |
 | **5. Generators + bake-off** | WF-00 persona, WF-01 router, WF-02 notes, WF-03 case studies, WF-04 OSS + `oss.sync`; run §13 bake-off and pick models per step | Each sample doc produces the right outputs, approved from email, live on the site |
+| **5b. Profile + resume** | WF-06 `gen.profile` with the real CV, Gotenberg service, resume template, WF-07 `gen.resume`, `/api/resume.pdf`, Download Resume buttons | Upload CV → approve Profile diff → site and resume update; resume passes an ATS text-extraction check and is ≤ 2 pages |
 | **6. Social** | WF-05 fan-out, `publish.linkedin`, `publish.x`, idempotent claims, "published" email | Drop file → note + case study update + LinkedIn + X; retry doesn't double-post |
 | **7. Hardening** | Backups, token-expiry emails, sweeper, rate limits, prompt versioning, `export-commits.sh`, runbook | One week of real use with no manual DB fixes |
 | **8. Extensibility proof** | `publish.instagram` + media step; a second notifier (e.g. Telegram) | Both added with no backend or router changes |
