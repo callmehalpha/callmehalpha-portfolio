@@ -2,8 +2,8 @@
   {
     "title": "The Case for Modular Monoliths",
     "date": "2025-10-10",
-    "excerpt": "Written from experience building  — a multi-tenant institutional system operating under regulatory, operational, and hardware constraints.",
-    "content": "Early in Virtuosphere, the temptation to adopt microservices was strong. Instead, we chose a modular monolith. This allowed us to enforce clear domain boundaries, preserve transactional integrity, and operate with predictable latency in live institutional environments. By keeping services co-located but strictly modular, we reduced operational overhead, simplified deployments, and retained the ability to refactor safely as requirements evolved. As domains matured and usage scaled, the explicit boundaries defined early made later service extraction a refactoring exercise rather than a rewrite.",
+    "excerpt": "Written from experience building Virtuo — a multi-tenant institutional system operating under regulatory, operational, and hardware constraints.",
+    "content": "Early in Virtuo, the temptation to adopt microservices was strong. Instead, we chose a modular monolith. This allowed us to enforce clear domain boundaries, preserve transactional integrity, and operate with predictable latency in live institutional environments. By keeping services co-located but strictly modular, we reduced operational overhead, simplified deployments, and retained the ability to refactor safely as requirements evolved. As domains matured and usage scaled, the explicit boundaries defined early made later service extraction a refactoring exercise rather than a rewrite.",
     "url": "https://www.linkedin.com/feed/update/urn:li:activity:7382334959094771713"
   }
 ]

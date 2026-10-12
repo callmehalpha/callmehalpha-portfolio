@@ -46,7 +46,7 @@ export const CASE_STUDIES: CaseStudy[] = [
     context:
       "Atlax Exchange is a high-availability digital asset exchange processing critical financial operations. The backend handles wallet infrastructure, transaction state management, multi-bank integrations, and compliance-driven limits under strict transactional guarantees.",
     role:
-      "Senior Product Engineer. Built core transaction processing services, bank provider abstractions, real-time success-rate monitors, and granular business roles engine.",
+      "Full Stack Engineer. Built core transaction processing services, bank provider abstractions, real-time success-rate monitors, and granular business roles engine.",
     architecture:
       "Containerized microservices written in Go running against PostgreSQL datastores. Features a canonical bank code translation layer for multi-provider routing and automated cron monitoring. Web frontend uses React with code-splitting, lazy loading, and Suspense to keep high-volume transaction dashboards performing under load.",
     decisions: [
@@ -64,8 +64,8 @@ export const CASE_STUDIES: CaseStudy[] = [
       "Abstraction layers must protect the client from third-party instability. Designing systems to fail over automatically and report alerts in real time saves hours of manual troubleshooting."
   },
   {
-    id: "virtuosphere",
-    name: "Virtuosphere",
+    id: "virtuo",
+    name: "Virtuo",
     url: "https://v1.virtuobusiness.com",
     focus: [
       "NestJS & React Native",
@@ -106,7 +106,7 @@ export const CASE_STUDIES: CaseStudy[] = [
     context:
       "Frootify is an asset-backed preventive healthcare business that transitioned from a walk-in retail model to a B2B2C, internet-enabled distribution system, optimizing logistics and staff accountability for multi-location operations.",
     role:
-      "Lead Product Engineer, promoted to Chief Technology Officer. Owned technical strategy, stabilized the legacy backend, rebuilt the web frontend, and launched logistics APIs.",
+      "Lead Product Engineer. Owned technical strategy, stabilized the legacy backend, rebuilt the web frontend, and launched logistics APIs.",
     architecture:
       "Laravel backend with a PostgreSQL datastore, a React web frontend (built with Vite), and a React Native staff mobile application. Exposes a public logistics API (Dispatch Hub) for third-party logistics integration.",
     decisions: [
@@ -135,7 +135,7 @@ export const CASE_STUDIES: CaseStudy[] = [
     context:
       "Circlify is a community finance platform designed for UK diaspora groups and Nigerian cooperatives to coordinate rotating savings (Ajo/Chama), contribution pools, and payouts safely.",
     role:
-      "Founder & System Architect. Managed product design, compliance decisions, database schema, and transaction guarantees.",
+      "Founder & System Architect. Rolled out under USAIY Limited. Managed product design, compliance decisions, database schema, and transaction guarantees.",
     architecture:
       "Group-centric system built with a modular NestJS/Laravel/Go backend. Features automated cycle management and scheduled payout engines with transaction guarantees. Built to run across UK and Nigerian regulatory spaces.",
     decisions: [
@@ -148,7 +148,7 @@ export const CASE_STUDIES: CaseStudy[] = [
     challenges:
       "Ensuring transactional correctness in rotating financial circles where participants depend on scheduled, guaranteed payouts, while managing regulatory overhead across UK and Nigerian jurisdictions.",
     outcome:
-      "Shipped a fully functional MVP supporting managed community savings circles, featuring robust authority controls, compliance guardrails, and audit trails.",
+      "Shipped a fully functional MVP supporting managed community savings circles, featuring robust authority controls, compliance guardrails, and audit trails. Circlify is currently in maintenance mode while I make changes, with a planned reopening in mid-2027.",
     lessons:
       "When dealing with community money, trust is a design requirement. By setting strict administrative boundaries and aligning with compliance early, the system protects both users and the business."
   },
@@ -160,26 +160,26 @@ export const CASE_STUDIES: CaseStudy[] = [
       "Government compliance",
       "Laravel 4 legacy migration",
       "NestJS & Next.js transition",
-      "Developer onboarding"
+      "Cross-team collaboration"
     ],
     context:
       "NOGIC JQS is a government compliance and workforce monitoring portal built for the Nigerian Content Development and Monitoring Board (NCDMB). The system manages regulatory approvals, contractor registries, and compliance checks at a national level.",
     role:
-      "Full-Stack Engineer. Managed legacy Laravel 4 core systems, built new compliance modules, and initiated/led the transition to a modern NestJS and Next.js architecture.",
+      "Full-Stack Engineer. Managed legacy Laravel 4 core systems, built new compliance modules, and initiated and led the first phase of the move to NestJS and Next.js (planning the target architecture), then kept contributing after the team lead took the migration forward.",
     architecture:
       "Legacy PHP Laravel 4 monolithic architecture. Target migrated architecture is built with NestJS for backend services, Next.js for portal frontends, and PostgreSQL for secure datastore management.",
     decisions: [
       "Delivered 4 new high-priority compliance modules within the legacy Laravel 4 system while maintaining full backwards compatibility and production uptime.",
-      "Initiated, designed, and executed a migration strategy to shift core services from a Laravel 4 monolith to NestJS and Next.js.",
-      "Onboarded and mentored 3 separate engineering teams to the new NestJS/Next.js codebase, ensuring a smooth transition of development practices.",
+      "Initiated and led the architecture-planning phase of the migration from a Laravel 4 monolith to NestJS and Next.js, then continued contributing to its delivery under the team lead.",
+      "Collaborated with 3 engineering teams during the move to the new NestJS/Next.js codebase, aligning development practices across them.",
       "Took sole ownership of backend engineering and feature delivery for the NCDMB compliance system during its final legacy phases."
     ],
     challenges:
-      "Maintaining a highly active legacy Laravel 4 application with zero downtime while designing a parallel migration path to NestJS and onboarding multiple development teams.",
+      "Maintaining a highly active legacy Laravel 4 application with zero downtime while designing a parallel migration path to NestJS and working alongside multiple development teams.",
     outcome:
       "Successfully maintained the NCDMB platform, delivered new modules under strict government timelines, and successfully migrated core application paths to the new NestJS service layer.",
     lessons:
-      "Migrating legacy systems requires a double-run strategy: preserve the monolithic core for stability while carving out modular services. Developer onboarding and documentation are just as critical as architectural design."
+      "Migrating legacy systems requires a double-run strategy: preserve the monolithic core for stability while carving out modular services. Documentation and shared conventions across teams are just as critical as architectural design."
   }
 ];
 
@@ -188,9 +188,9 @@ export const BUILD_LOGS: BuildLog[] = [
     title: "The Case for Modular Monoliths",
     date: "2025-10-10",
     excerpt:
-      "Written from experience building  — a multi-tenant institutional system operating under regulatory, operational, and hardware constraints.",
+      "Written from experience building Virtuo — a multi-tenant institutional system operating under regulatory, operational, and hardware constraints.",
     content:
-      "Early in Virtuosphere, the temptation to adopt microservices was strong. Instead, we chose a modular monolith. This allowed us to enforce clear domain boundaries, preserve transactional integrity, and operate with predictable latency in live institutional environments. By keeping services co-located but strictly modular, we reduced operational overhead, simplified deployments, and retained the ability to refactor safely as requirements evolved. As domains matured and usage scaled, the explicit boundaries defined early made later service extraction a refactoring exercise rather than a rewrite.",
+      "Early in Virtuo, the temptation to adopt microservices was strong. Instead, we chose a modular monolith. This allowed us to enforce clear domain boundaries, preserve transactional integrity, and operate with predictable latency in live institutional environments. By keeping services co-located but strictly modular, we reduced operational overhead, simplified deployments, and retained the ability to refactor safely as requirements evolved. As domains matured and usage scaled, the explicit boundaries defined early made later service extraction a refactoring exercise rather than a rewrite.",
     url: "https://www.linkedin.com/feed/update/urn:li:activity:7382334959094771713"
   }
 ];

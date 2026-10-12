@@ -31,7 +31,7 @@ interface SeedNote {
 /** How each existing case study's project is classified. Editable later via the admin API. */
 const PROJECT_KINDS: Record<string, ProjectKind> = {
   'atlax-exchange': 'CLIENT',
-  virtuosphere: 'PRODUCT',
+  virtuo: 'PRODUCT',
   frootify: 'CLIENT',
   circlify: 'PRODUCT',
   nogic: 'CLIENT',
@@ -70,9 +70,9 @@ export function initialProfile(dir: string): ProfileData {
       headline: 'Systems & Architecture',
       tagline: 'I build high-integrity systems where trust, scale, and real-world constraints matter.',
       intro:
-        "I design and build backend systems where failure is expensive — spanning fintech, SaaS, commerce, and compliance. My focus is architectural clarity: authority-first design, transactional correctness, and software built to survive physical and regulatory constraints. I've engineered 8+ production platforms including digital asset exchanges, cashless institutional payments, and multi-tenant architectures.",
+        "I design and build backend systems where failure is expensive — spanning fintech, SaaS, commerce, and compliance. My focus is architectural clarity: authority-first design, transactional correctness, and software built to survive physical and regulatory constraints. I've engineered production platforms including digital asset exchanges, cashless institutional payments, and multi-tenant architectures.",
     },
-    heroStats: [{ label: 'Production platforms', value: '8+', evidence: 'Live production portfolio listed in the CV and on the portfolio' }],
+    heroStats: [{ label: 'Production platforms', value: '0', evidence: 'Case studies live on the portfolio', derive: 'case_study_count' }],
     capabilities: readJson(dir, 'capabilities.json'),
     philosophies: readJson(dir, 'philosophies.json'),
   });
@@ -187,4 +187,30 @@ export async function seed(prisma: PrismaClient, opts: SeedOptions = {}) {
     });
     await prisma.profile.update({ where: { id: 'me' }, data: { currentRevisionId: rev.id } });
   }
+
+  // The CV-based profile goes in as a draft: it changes the positioning, so it waits for my approval.
+  const cvChangelog = 'Profile from the three CVs, reconciled (see seed/profile-v1-review.md)';
+  if (!(await prisma.profileRevision.findFirst({ where: { profileId: 'me', changelog: cvChangelog } }))) {
+    const latest = await prisma.profileRevision.findFirstOrThrow({ where: { profileId: 'me' }, orderBy: { version: 'desc' } });
+    await prisma.profileRevision.create({
+      data: {
+        profileId: 'me',
+        version: latest.version + 1,
+        data: cvProfile(dir) as unknown as Prisma.InputJsonValue,
+        privacy: {},
+        changelog: cvChangelog,
+        sourceIds: [],
+        status: 'DRAFT',
+      },
+    });
+  }
+}
+
+/** The reconciled CV profile, keeping today's capability cards and philosophies. */
+export function cvProfile(dir: string): ProfileData {
+  return profileData.parse({
+    ...readJson<Record<string, unknown>>(dir, 'profile-cv.json'),
+    capabilities: readJson(dir, 'capabilities.json'),
+    philosophies: readJson(dir, 'philosophies.json'),
+  });
 }

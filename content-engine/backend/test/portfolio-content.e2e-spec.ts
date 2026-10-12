@@ -204,13 +204,46 @@ describe('portfolio content: case studies, open source, profile (e2e)', () => {
       await ctx.internal('post', `/internal/content/profile_revision/${rev.body.id}`).send({ action: 'approve' }).expect(200);
 
       const res = await ctx.http().get('/api/profile').expect(200);
-      expect(res.body.version).toBe(2);
+      expect(res.body.version).toBe(3);
       expect(res.body.basics).not.toHaveProperty('phone');
       expect(res.body.basics).not.toHaveProperty('email');
       expect(res.body.basics.location).toEqual({ city: 'Ibadan' });
 
       const internal = await ctx.internal('get', '/internal/profile').expect(200);
       expect(internal.body.current.data.basics.phone).toBe('0000 000 0000'); // n8n still sees everything
+    });
+
+    it('seeds the CV-based profile as a draft that goes live only once approved', async () => {
+      const draft = await ctx.prisma.profileRevision.findFirstOrThrow({ where: { status: 'DRAFT' } });
+      expect(draft.version).toBe(2);
+      expect((await ctx.http().get('/api/profile')).body.basics.label).toBe('Systems Engineer & Technical Founder');
+
+      await ctx.admin('post', `/admin/content/profile_revision/${draft.id}`).send({ action: 'approve' }).expect(200);
+      const res = await ctx.http().get('/api/profile').expect(200);
+      expect(res.body).toMatchObject({
+        version: 2,
+        basics: { label: 'Technical Product Builder' },
+        positioning: { tagline: 'I turn business problems into shipped technology products.' },
+      });
+      const atlax = res.body.work.find((w: { name: string }) => w.name === 'Atlax Exchange');
+      expect(atlax).toMatchObject({ position: 'Full Stack Engineer', startDate: '2025-07' });
+      expect(atlax).not.toHaveProperty('endDate');
+      expect(res.body.work.find((w: { name: string }) => w.name === 'Frootify').position).toBe('Lead Product Engineer');
+      expect(res.body.work.map((w: { projectSlug?: string }) => w.projectSlug)).toContain('virtuo');
+      expect(JSON.stringify(res.body)).not.toMatch(/Virtuosphere/);
+    });
+
+    it('counts production platforms from the case studies that are live', async () => {
+      const stat = () =>
+        ctx.http().get('/api/profile').then((r) => r.body.heroStats.find((s: { label: string }) => s.label === 'Production platforms'));
+      expect(await stat()).toEqual({ label: 'Production platforms', value: '5', evidence: 'Case studies live on the portfolio' });
+
+      await ctx.admin('patch', '/admin/projects/nogic').send({ visible: false }).expect(200);
+      expect((await stat()).value).toBe('4');
+
+      const draft = await ctx.prisma.profileRevision.findFirstOrThrow({ where: { status: 'DRAFT' } });
+      await ctx.admin('post', `/admin/content/profile_revision/${draft.id}`).send({ action: 'approve' }).expect(200);
+      expect((await stat()).value).toBe('4'); // the CV profile derives it the same way
     });
 
     it('requires evidence for every hero stat', async () => {

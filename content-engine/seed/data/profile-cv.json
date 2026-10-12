@@ -1,0 +1,241 @@
+{
+  "basics": {
+    "name": "Abdulazeez Yisau Temitope",
+    "label": "Technical Product Builder",
+    "email": "abdulazeezyisau@gmail.com",
+    "url": "https://abdulazeez.usaiy.xyz",
+    "summary": "Technical product builder with 6+ years shipping payments, healthcare and operational platforms end to end. I work primarily in Node.js and NestJS with TypeScript and PostgreSQL, with production Go on a live payments exchange and a long background in PHP and Laravel, and I ship React, Next.js and React Native front ends. My work centres on systems where correctness matters: payout and settlement services, third-party API and webhook integrations, reconciliation, role-based access control and automated notification pipelines. I take products from business problem to production, often as the sole or lead engineer.",
+    "location": {
+      "city": "Ibadan",
+      "countryCode": "NG"
+    },
+    "profiles": [
+      {
+        "network": "LinkedIn",
+        "username": "abdulazeez-yisau-tech-ceo",
+        "url": "https://www.linkedin.com/in/abdulazeez-yisau-tech-ceo/"
+      },
+      {
+        "network": "GitHub",
+        "username": "callmehalpha",
+        "url": "https://github.com/callmehalpha"
+      }
+    ]
+  },
+  "positioning": {
+    "headline": "Technical Product Builder",
+    "tagline": "I turn business problems into shipped technology products.",
+    "intro": "6+ years building payments, healthcare and operational platforms end to end across fintech, healthcare and African markets: from a 15,000-user cashless payments platform I co-founded, to payout services processing 8,800+ transactions a week, to a telemedicine platform I took from concept to launch readiness as the sole engineer."
+  },
+  "heroStats": [
+    {
+      "label": "Active users on a platform I co-founded",
+      "value": "15,000+",
+      "evidence": "Virtuo, live production (all three CVs)"
+    },
+    {
+      "label": "Payout transactions in one week, 98% success",
+      "value": "8,800+",
+      "evidence": "Atlax Exchange payout and settlement services across two providers (Full Stack and Backend CVs)"
+    },
+    {
+      "label": "Weeks from concept to launch-ready, sole engineer",
+      "value": "10",
+      "evidence": "DOKTA telemedicine platform, 42-item roadmap delivered ahead of schedule (Full Stack and Backend CVs)"
+    },
+    {
+      "label": "Order throughput after backend work",
+      "value": "5×",
+      "evidence": "Frootify / myBlongo order management refactor (Temitope CV, Frootify case study)"
+    },
+    {
+      "label": "Production platforms",
+      "value": "0",
+      "evidence": "Case studies live on the portfolio",
+      "derive": "case_study_count"
+    }
+  ],
+  "work": [
+    {
+      "name": "Atlax Exchange",
+      "position": "Full Stack Engineer",
+      "url": "https://atlaxchange.com",
+      "location": "Remote",
+      "startDate": "2025-07",
+      "summary": "Digital asset and payments exchange (Atlax Finance Limited).",
+      "highlights": [
+        "Build and maintain core backend services in Go and PostgreSQL, with an emphasis on transactional integrity and data consistency under load.",
+        "Payout and settlement services I work on processed 8,800+ transactions in a single week at a 98% success rate across two provider integrations.",
+        "Delivered a Nigerian partner-bank integration covering payouts, account name verification, bank listings and virtual-account deposit reconciliation against OAuth-secured APIs.",
+        "Built the bank provider abstraction: a canonical bank-code registry with internal routing, so provider-specific codes never reach users.",
+        "Built automated provider monitoring that tracks uptime and success rates and fails over after three consecutive failures, alerting the business team in real time.",
+        "Built the user tier system with daily and per-transaction limits and a compliance-controlled override, plus custom roles and team invites for business accounts.",
+        "Built a high-volume React transaction datatable with lazy loading, code splitting and Suspense."
+      ],
+      "projectSlug": "atlax-exchange"
+    },
+    {
+      "name": "DOKTA (Access Providence Healthcare Systems)",
+      "position": "Backend and Product Engineer (Contract)",
+      "location": "Remote",
+      "startDate": "2026-07",
+      "endDate": "2026-08",
+      "summary": "Two-month contract building a telemedicine platform.",
+      "highlights": [
+        "Took the platform from concept to launch readiness as the sole engineer: NestJS backend, React web app and React Native mobile client.",
+        "Completed a 42-item, ten-week delivery roadmap ahead of schedule, with weekly written and dashboard reporting to the chief executive.",
+        "Implemented a two-sided payment module: patient consultation billing and practitioner payouts, with reconciliation and transaction history.",
+        "Delivered real-time consultation over video, voice and text chat, plus the internal admin dashboard and call-centre tooling."
+      ]
+    },
+    {
+      "name": "USAIY Limited",
+      "position": "Founder and Chief Technology Officer",
+      "url": "https://usaiy.xyz",
+      "location": "Ibadan, Nigeria",
+      "startDate": "2025-01",
+      "summary": "Product studio that builds and runs its own platforms and client products.",
+      "highlights": [
+        "Own architecture, delivery and infrastructure across the studio's platforms: Circlify and GiftPing (in maintenance mode while I rework them, reopening mid-2027), BureauOS (in development) and MÍRÀ Africa (currently offline).",
+        "Founded Circlify, a rotational savings (Ajo) and contributions platform rolled out under USAIY.",
+        "Design multi-tenant systems with role-based access control and granular permissions as standard on every build.",
+        "Build and operate transactional email and notification pipelines on self-hosted mail infrastructure."
+      ],
+      "projectSlug": "circlify"
+    },
+    {
+      "name": "Frootify",
+      "position": "Lead Product Engineer",
+      "url": "https://frootify.tech",
+      "location": "Remote",
+      "startDate": "2025-03",
+      "endDate": "2026-04",
+      "summary": "Preventive healthcare SaaS.",
+      "highlights": [
+        "Owned the full Laravel backend for a production healthcare SaaS: stabilised delivery, authentication, multi-role access control and analytics.",
+        "Rewrote the web frontend in React with Vite, clearing accumulated technical debt and speeding up team delivery.",
+        "Built a React Native staff app with geo-fencing and device binding, shipped to production.",
+        "Launched Dispatch Hub, a public Laravel API for third-party delivery businesses; backend work on myBlongo contributed to a 5× increase in order throughput."
+      ],
+      "projectSlug": "frootify"
+    },
+    {
+      "name": "Virtuo",
+      "position": "Co-Founder and Lead Engineer",
+      "url": "https://v1.virtuobusiness.com",
+      "location": "Lagos / Remote",
+      "startDate": "2024-01",
+      "endDate": "2026-03",
+      "summary": "Institutional operations platform: digital identity, cashless payments and administrative workflow.",
+      "highlights": [
+        "Co-founded and built the platform; it reached 15,000+ active users across institutions, merchants and individuals before I exited in March 2026.",
+        "Led a 9-day sprint to a production payment collection and payout MVP on custom NFC hardware, writing the TCP communication layer from scratch.",
+        "Designed the NestJS backend, Next.js web dashboard and React Native mobile client, with distinct permission scopes per stakeholder type."
+      ],
+      "projectSlug": "virtuo"
+    },
+    {
+      "name": "Vascon Solutions",
+      "position": "Full Stack Engineer",
+      "location": "Remote",
+      "startDate": "2020-04",
+      "endDate": "2024-02",
+      "summary": "Joined as a junior engineer and grew into leading full-stack delivery on core modules.",
+      "highlights": [
+        "Delivered four core modules of a government-facing Laravel application for the Nigerian Content Development and Monitoring Board, becoming the sole engineer on it in later years.",
+        "Initiated and led the first phase of the migration from Laravel 4 to NestJS and Next.js, planning the target architecture, then kept contributing after the team lead took the migration forward.",
+        "Built a content management system that served as the backend foundation for a high-traffic e-commerce platform.",
+        "Handled VPS provisioning, deployment workflows and production reliability for the systems I owned."
+      ],
+      "projectSlug": "nogic"
+    }
+  ],
+  "education": [
+    {
+      "institution": "Olabisi Onabanjo University",
+      "area": "Computer Science",
+      "studyType": "BSc",
+      "startDate": "2019",
+      "endDate": "2022"
+    },
+    {
+      "institution": "Federal Polytechnic Ilaro",
+      "area": "Computer Science",
+      "studyType": "National Diploma",
+      "startDate": "2015",
+      "endDate": "2017"
+    }
+  ],
+  "skills": [
+    {
+      "name": "Backend",
+      "keywords": [
+        "Node.js",
+        "NestJS",
+        "TypeScript",
+        "Go",
+        "PostgreSQL",
+        "REST API design",
+        "Queues and background jobs",
+        "Modular service architecture"
+      ]
+    },
+    {
+      "name": "Frontend",
+      "keywords": [
+        "React",
+        "Next.js",
+        "TypeScript",
+        "Tailwind"
+      ]
+    },
+    {
+      "name": "Mobile",
+      "keywords": [
+        "React Native"
+      ]
+    },
+    {
+      "name": "Payments and fintech",
+      "keywords": [
+        "Payout and settlement",
+        "Ledger and reconciliation",
+        "Provider failover",
+        "Tier-based limits",
+        "Paystack",
+        "Stripe"
+      ]
+    },
+    {
+      "name": "Platform",
+      "keywords": [
+        "Multi-tenancy",
+        "Role-based access control",
+        "Webhooks",
+        "Transactional email",
+        "Admin dashboards"
+      ]
+    },
+    {
+      "name": "Also",
+      "keywords": [
+        "PHP",
+        "Laravel",
+        "MySQL",
+        "Redis",
+        "Supabase",
+        "Docker",
+        "NGINX",
+        "GitHub Actions"
+      ]
+    }
+  ],
+  "leadSkills": [
+    "NestJS",
+    "TypeScript",
+    "Go",
+    "PostgreSQL",
+    "React",
+    "Payments infrastructure"
+  ]
+}
