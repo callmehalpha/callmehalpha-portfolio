@@ -3,23 +3,37 @@ import {
   Menu, X, ArrowRight, ChevronRight, Terminal, 
   Mail, Linkedin, ShieldCheck, Cpu, Layout, Twitter
 } from 'lucide-react';
-import { CASE_STUDIES, PHILOSOPHIES, CAPABILITIES, BUILD_LOGS } from '../data/constants';
-import { PRODUCTS } from '../data/products';
+import { Link } from 'react-router-dom';
+import { CASE_STUDIES } from '../data/constants';
 import { Section } from '../components/Section';
 import { CapabilityCard } from '../components/CapabilityCard';
 import { CaseStudyCard } from '../components/CaseStudyCard';
 import { BuildLogEntry } from '../components/BuildLogEntry';
-import { ProductCard } from '../components/ProductCard';
-import { ProductCarousel } from '../components/ProductCarousel';
+import { OssProjectCard } from '../components/OssProjectCard';
+import { ExperienceTimeline } from '../components/ExperienceTimeline';
 import { SEO } from '../components/SEO';
+import { api } from '../lib/api';
+import { FALLBACK_NOTES, FALLBACK_PROFILE } from '../lib/content';
+import { useContent } from '../lib/useContent';
+import type { CaseStudy } from '../types';
+import type { OssProject } from '../types/content';
+
+const NO_OSS: OssProject[] = [];
 
 export const Portfolio = () => {
   const [activeNav, setActiveNav] = useState('hero');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
+  const { data: profile } = useContent((signal) => api.profile(signal), FALLBACK_PROFILE);
+  const { data: caseStudies } = useContent<CaseStudy[]>((signal) => api.caseStudies(signal), CASE_STUDIES);
+  const { data: notes } = useContent((signal) => api.notes({ pageSize: 6 }, signal).then((r) => r.items), FALLBACK_NOTES);
+  const { data: ossProjects } = useContent((signal) => api.oss(signal), NO_OSS);
+  const hasExperience = profile.work.length > 0;
+  const github = profile.basics.profiles.find((p) => p.network === 'GitHub');
+
   useEffect(() => {
     const handleScroll = () => {
-      const sections = ['hero', 'philosophy', 'capabilities', 'case-studies', 'build-logs', 'products', 'operating', 'contact'];
+      const sections = ['hero', 'philosophy', 'capabilities', 'case-studies', 'experience', 'build-logs', 'open-source', 'operating', 'contact'];
       const scrollPosition = window.scrollY + 100;
 
       for (const section of sections) {
@@ -39,9 +53,10 @@ export const Portfolio = () => {
 
   const navItems = [
     { id: 'case-studies', label: 'Case Studies' },
+    ...(hasExperience ? [{ id: 'experience', label: 'Experience' }] : []),
     { id: 'capabilities', label: 'Capabilities' },
-    { id: 'build-logs', label: 'Logs' },
-    { id: 'products', label: 'Products' },
+    { id: 'build-logs', label: 'Notes' },
+    { id: 'open-source', label: 'Open Source' },
     { id: 'contact', label: 'Contact' },
   ];
 
@@ -107,18 +122,26 @@ export const Portfolio = () => {
       {/* Hero Section */}
       <Section id="hero" className="min-h-screen flex flex-col justify-center pt-32 pb-16">
         <div className="max-w-3xl">
-          <span className="text-indigo-500 font-mono text-sm uppercase tracking-[0.2em] mb-4 block animate-in fade-in slide-in-from-bottom-2 duration-700">Systems & Architecture</span>
+          <span className="text-indigo-500 font-mono text-sm uppercase tracking-[0.2em] mb-4 block animate-in fade-in slide-in-from-bottom-2 duration-700">{profile.positioning.headline}</span>
           <h1 className="text-6xl md:text-8xl font-bold text-white mb-8 tracking-tighter leading-tight animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100">
             Callme<span className="text-zinc-600">halpha</span>
           </h1>
           <p className="text-2xl md:text-3xl font-medium text-zinc-400 mb-10 leading-snug animate-in fade-in slide-in-from-bottom-6 duration-700 delay-200">
-            I build high-integrity systems where trust, scale, and real-world constraints matter.
+            {profile.positioning.tagline}
           </p>
           <p className="text-zinc-500 text-lg md:text-xl max-w-2xl mb-12 leading-relaxed animate-in fade-in slide-in-from-bottom-8 duration-700 delay-300">
-            I design and build backend systems where failure is expensive — spanning fintech, SaaS, commerce, and compliance.
-            My focus is architectural clarity: authority-first design, transactional correctness, and software built to survive physical and regulatory constraints.
-            I've engineered 8+ production platforms including digital asset exchanges, cashless institutional payments, and multi-tenant architectures.
+            {profile.positioning.intro}
           </p>
+          {profile.heroStats.length > 0 && (
+            <dl className="grid grid-cols-2 md:grid-cols-3 gap-6 max-w-3xl mb-12" aria-label="Highlights">
+              {profile.heroStats.map((stat) => (
+                <div key={stat.label} className="border-l-2 border-indigo-600 pl-4 flex flex-col-reverse">
+                  <dt className="text-zinc-500 text-xs leading-snug">{stat.label}</dt>
+                  <dd className="text-white text-3xl font-bold tracking-tight">{stat.value}</dd>
+                </div>
+              ))}
+            </dl>
+          )}
           <div className="flex flex-wrap gap-4 animate-in fade-in slide-in-from-bottom-10 duration-700 delay-500">
             <a
               href="#case-studies"
@@ -141,7 +164,7 @@ export const Portfolio = () => {
       {/* Technical Philosophy */}
       <div id="philosophy" className="bg-zinc-950 border-y border-zinc-900 py-16">
         <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-12">
-          {PHILOSOPHIES.map((phi, i) => (
+          {profile.philosophies.map((phi, i) => (
             <div key={i} className="group">
               <h4 className="text-white font-bold mb-2 flex items-center gap-2 group-hover:text-indigo-400 transition-colors">
                 <ChevronRight size={14} className="text-indigo-600" />
@@ -156,7 +179,7 @@ export const Portfolio = () => {
       {/* Capabilities */}
       <Section id="capabilities" title="Core Capabilities">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {CAPABILITIES.map((cap, i) => (
+          {profile.capabilities.map((cap, i) => (
             <CapabilityCard key={i} capability={cap} />
           ))}
         </div>
@@ -165,7 +188,7 @@ export const Portfolio = () => {
       {/* Case Studies */}
       <Section id="case-studies" title="Technical Case Studies" className="bg-zinc-950/30 overflow-hidden">
         <div className="flex overflow-x-auto snap-x snap-mandatory gap-6 pb-12 -mx-6 px-6 no-scrollbar">
-          {CASE_STUDIES.map((study, i) => (
+          {caseStudies.map((study, i) => (
             <CaseStudyCard
               key={study.id}
               study={study}
@@ -178,27 +201,47 @@ export const Portfolio = () => {
         </div>
       </Section>
 
-      {/* Build Logs */}
+      {/* Experience */}
+      {hasExperience && (
+        <Section id="experience" title="Experience">
+          <ExperienceTimeline work={profile.work} caseStudyIds={caseStudies.map((c) => c.id)} />
+        </Section>
+      )}
+
+      {/* Technical Notes */}
       <Section id="build-logs" title="Technical Notes" className="overflow-hidden">
         <div className="flex overflow-x-auto snap-x snap-mandatory gap-6 pb-12 -mx-6 px-6 no-scrollbar">
-          {BUILD_LOGS.map((log, i) => (
-            <BuildLogEntry key={i} log={log} />
+          {notes.map((note) => (
+            <BuildLogEntry key={note.slug} note={note} />
           ))}
         </div>
-        <div className="mt-4 flex items-center gap-2 text-zinc-600 font-mono text-[10px] uppercase">
-          <ArrowRight size={12} /> Scroll for technical deep dives
+        <div className="mt-4 flex items-center justify-between gap-2 text-zinc-600 font-mono text-[10px] uppercase">
+          <span className="flex items-center gap-2"><ArrowRight size={12} /> Scroll for technical deep dives</span>
+          <Link to="/notes" className="text-indigo-500 font-bold tracking-widest hover:text-indigo-400">All notes →</Link>
         </div>
       </Section>
 
-      <Section id="products" title="Products">
+      {/* Open Source */}
+      <Section id="open-source" title="Open Source Projects">
         <p className="text-zinc-400 text-lg mb-12 max-w-2xl -mt-6">
-          Tools and resources I've built to solve real problems — available for instant download.
+          Open-source projects I build and contribute to.
         </p>
-        <ProductCarousel>
-          {PRODUCTS.map((product) => (
-            <ProductCard key={product.slug} product={product} />
-          ))}
-        </ProductCarousel>
+        {ossProjects.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {ossProjects.map((project) => (
+              <OssProjectCard key={project.slug} project={project} />
+            ))}
+          </div>
+        ) : (
+          <p className="text-zinc-500 text-sm">
+            The first projects are on their way.{' '}
+            {github && (
+              <a href={github.url} target="_blank" rel="noopener noreferrer" className="text-indigo-400 hover:text-indigo-300 underline">
+                Follow along on GitHub
+              </a>
+            )}
+          </p>
+        )}
       </Section>
 
       {/* Operating Style */}

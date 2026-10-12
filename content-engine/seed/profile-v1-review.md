@@ -32,7 +32,26 @@ directly onto resume variants in §6.7 of the plan.
 - **Atlax Exchange:** started Jul 2025; Go + PostgreSQL; payments/exchange backend
 - **Core stack:** Node.js, NestJS, TypeScript, Go, PostgreSQL, React, Next.js, React Native, PHP/Laravel, Docker
 
-## 2. Conflicts — need your answer
+## 2. Conflicts — resolved 2026-10-12
+
+| # | Decision |
+|---|---|
+| C1 | Atlax: **Full Stack Engineer**, Jul 2025 – present (still there) |
+| C2 | **6+ years** |
+| C4 | Vascon: **initiated and led the first phase** (planning the architecture migration); the team lead took it from there, and I kept contributing |
+| C5 | Frootify: **Lead Product Engineer** only, until the CTO role has documentation |
+| C6 | DOKTA: **two-month contract** (Jul–Aug 2026). Retainer / head-of-product offer is still in deliberation, so it is not mentioned |
+| C7 | **Virtuo** everywhere (no "Virtuosphere") |
+| C9 | Circlify: **I'm the founder**; it's a product rolled out under USAIY |
+
+Still open: C3 (platform count, kept at 8 as on the current site), C8 (MÍRÀ detail), C10 (GiftPing still live?),
+C12 (headline: the CV profile uses Technical Product Builder and waits for approval), and whether the
+"onboarded 3 engineering teams" line in the NOGIC case study still holds now that the team lead ran the later phases.
+
+The reconciled profile is `seed/data/profile-cv.json`. The seed adds it as a **draft** Profile revision; the site keeps the
+current copy until it's approved (`POST /admin/content/profile_revision/<id> {"action":"approve"}`).
+
+### Original conflict table
 
 | # | Topic | What the sources say | Proposed canonical | Your call |
 |---|---|---|---|---|

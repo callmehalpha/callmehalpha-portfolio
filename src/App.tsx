@@ -10,6 +10,8 @@ import { PRODUCTS } from './data/products';
 const Portfolio = lazy(() => import('./pages/Portfolio').then(module => ({ default: module.Portfolio })));
 const Product = lazy(() => import('./pages/Product'));
 const NotFound = lazy(() => import('./pages/NotFound').then(module => ({ default: module.NotFound })));
+const Notes = lazy(() => import('./pages/Notes').then(module => ({ default: module.Notes })));
+const Note = lazy(() => import('./pages/Note').then(module => ({ default: module.Note })));
 
 /**
  * ProductView handles locating the product data by slug 
@@ -36,6 +38,9 @@ export default function App() {
       <Suspense fallback={<LoadingSpinner />}>
         <Routes>
           <Route path="/" element={<Portfolio />} />
+          <Route path="/notes" element={<Notes />} />
+          <Route path="/notes/:slug" element={<Note />} />
+          {/* Products left the homepage, but existing links (Gumroad, socials) keep working. */}
           <Route path="/products/:slug" element={<ProductView />} />
           {/* Catch-all route for 404 handling within the SPA */}
           <Route path="*" element={<NotFound />} />

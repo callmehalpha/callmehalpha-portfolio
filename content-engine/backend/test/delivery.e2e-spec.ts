@@ -169,7 +169,7 @@ describe('delivery: publications, email, settings, registries (e2e)', () => {
       expect(await ctx.prisma.caseStudyRevision.count()).toBe(5);
       expect(await ctx.prisma.note.count()).toBe(1);
       expect(await ctx.prisma.publication.count()).toBe(1);
-      expect(await ctx.prisma.profileRevision.count()).toBe(1);
+      expect(await ctx.prisma.profileRevision.count()).toBe(2); // v1 live + the CV draft
       expect(await ctx.prisma.channel.count()).toBe(3);
       const email = await ctx.prisma.notifier.findUniqueOrThrow({ where: { key: 'email' } });
       expect(email.config).toMatchObject({ to: 'changed@example.com' });

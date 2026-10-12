@@ -1,6 +1,7 @@
 name: content-engine
 
 on:
+  workflow_dispatch:
   pull_request:
     paths: ["content-engine/**", ".github/workflows/content-engine.yml"]
   push:

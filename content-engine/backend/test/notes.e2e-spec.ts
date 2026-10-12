@@ -53,6 +53,8 @@ describe('technical notes (e2e)', () => {
     const list = await ctx.http().get('/api/notes').expect(200);
     expect(list.body.total).toBe(1);
     expect(list.body.items[0]).toMatchObject({ slug: note.slug, title: draft.title, tags: draft.tags });
+    expect(list.body.items[0].preview).toBe('Context We needed transactional integrity.');
+    expect(list.body.items[0]).not.toHaveProperty('bodyMarkdown');
     expect(list.body.items[0]).not.toHaveProperty('socialDrafts');
     expect(list.body.items[0]).not.toHaveProperty('llmMeta');
 

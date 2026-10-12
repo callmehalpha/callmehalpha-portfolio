@@ -3,6 +3,7 @@ import { ContentStatus, Note, Prisma } from '@prisma/client';
 import { z } from 'zod';
 import { assertTransition } from '../common/content-status';
 import { uniqueSlug } from '../common/slug';
+import { previewText } from './preview';
 import { PrismaService } from '../prisma/prisma.service';
 
 export const noteInput = z.object({
@@ -56,14 +57,19 @@ export class NotesService {
     const [items, total] = await Promise.all([
       this.prisma.note.findMany({
         where,
-        select: publicSelect,
+        select: { ...publicSelect, bodyMarkdown: true },
         orderBy: { publishedAt: 'desc' },
         skip: (q.page - 1) * q.pageSize,
         take: q.pageSize,
       }),
       this.prisma.note.count({ where }),
     ]);
-    return { items, total, page: q.page, pageSize: q.pageSize };
+    return {
+      items: items.map(({ bodyMarkdown, ...rest }) => ({ ...rest, preview: previewText(bodyMarkdown) })),
+      total,
+      page: q.page,
+      pageSize: q.pageSize,
+    };
   }
 
   async getPublished(slug: string) {
