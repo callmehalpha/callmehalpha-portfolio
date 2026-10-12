@@ -1,0 +1,47 @@
+[
+  {
+    "title": "Architecture & Systems Design",
+    "description": "Designing high-availability distributed systems with clear boundaries and domain-driven design principles.",
+    "items": [
+      "Microservices",
+      "Event-Driven Arch",
+      "Multi-tenant isolation"
+    ]
+  },
+  {
+    "title": "Backend Engineering",
+    "description": "Building robust API layers and business logic with a focus on performance and type safety.",
+    "items": [
+      "Node.js/TypeScript",
+      "Go",
+      "PostgreSQL/Redis",
+      "gRPC/REST",
+      "LARAVEL/PHP"
+    ]
+  },
+  {
+    "title": "Infrastructure & DevOps",
+    "description": "Treating infrastructure as code to ensure reproducible environments and automated scaling.",
+    "items": [
+      "Kubernetes",
+      "AWS/GCP",
+      "Terraform",
+      "CI/CD Pipelines",
+      "Docker",
+      "CodeRabbbit"
+    ]
+  },
+  {
+    "title": "Payments & Fintech Systems",
+    "description": "Developing mission-critical financial systems where accuracy and transaction integrity are non-negotiable.",
+    "items": [
+      "Double Entry Ledgering",
+      "KYC/KYB Integration",
+      "Fraud Detection",
+      "Stripe",
+      "Paystack",
+      "Flutterwave",
+      "Multi-currency support"
+    ]
+  }
+]

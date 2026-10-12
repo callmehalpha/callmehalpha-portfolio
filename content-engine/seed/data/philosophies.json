@@ -1,0 +1,22 @@
+[
+  {
+    "title": "Systems over features",
+    "description": "Functionality is transient; the integrity of the underlying system is what enables longevity."
+  },
+  {
+    "title": "Correctness before scale",
+    "description": "Premature optimization is the root of failure. Ensure the logic holds before widening the pipe."
+  },
+  {
+    "title": "Explicit ownership",
+    "description": "Code without a clear owner or boundary is technical debt by definition."
+  },
+  {
+    "title": "Build for failure",
+    "description": "Assume components will fail. Design systems that degrade gracefully rather than collapsing."
+  },
+  {
+    "title": "Boring tech, deliberate architecture",
+    "description": "Use proven tools to solve complex problems. Reserve innovation for the architecture, not the stack."
+  }
+]

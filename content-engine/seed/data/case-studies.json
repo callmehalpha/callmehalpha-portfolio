@@ -1,0 +1,120 @@
+[
+  {
+    "id": "atlax-exchange",
+    "name": "Atlax Exchange",
+    "url": "https://atlaxchange.com",
+    "focus": [
+      "Go / PostgreSQL backend",
+      "Bank provider abstraction",
+      "Automated provider failover",
+      "Tiered compliance limits"
+    ],
+    "context": "Atlax Exchange is a high-availability digital asset exchange processing critical financial operations. The backend handles wallet infrastructure, transaction state management, multi-bank integrations, and compliance-driven limits under strict transactional guarantees.",
+    "role": "Senior Product Engineer. Built core transaction processing services, bank provider abstractions, real-time success-rate monitors, and granular business roles engine.",
+    "architecture": "Containerized microservices written in Go running against PostgreSQL datastores. Features a canonical bank code translation layer for multi-provider routing and automated cron monitoring. Web frontend uses React with code-splitting, lazy loading, and Suspense to keep high-volume transaction dashboards performing under load.",
+    "decisions": [
+      "Designed a bank provider abstraction layer in Go that maps disparate provider-specific bank codes to a canonical code registry, shielding clients from third-party API variations.",
+      "Built an automated provider monitoring system tracking uptime and success rates; it triggers zero-intervention failover to secondary providers after three consecutive transaction failures.",
+      "Implemented a dynamic user tier system managing transaction limits, featuring compliance override paths that allow limit increases without altering base tier definitions.",
+      "Developed an isolated custom roles and permissions engine with team invitations for business accounts, running alongside but separate from system-level roles.",
+      "Created a high-volume React datatable using lazy loading, Suspense, and code splitting to handle massive transaction history screens efficiently."
+    ],
+    "challenges": "Ensuring zero-downtime banking failovers and transactional consistency under high throughput while separating compliance limits from user tier structures.",
+    "outcome": "Successfully shipped the core banking failover system and business user engine, resulting in zero-intervention downtime mitigation during bank provider outages and smooth onboarding of enterprise users.",
+    "lessons": "Abstraction layers must protect the client from third-party instability. Designing systems to fail over automatically and report alerts in real time saves hours of manual troubleshooting."
+  },
+  {
+    "id": "virtuosphere",
+    "name": "Virtuosphere",
+    "url": "https://v1.virtuobusiness.com",
+    "focus": [
+      "NestJS & React Native",
+      "NFC hardware integration",
+      "Multi-tenant institutions",
+      "9-day sprint MVP"
+    ],
+    "context": "Virtuo is a multi-tenant education management and cashless payments platform built for primary, secondary, and tertiary institutions. It combines academic administration with NFC-based identity and cashless payment infrastructure, serving over 15,000 active users.",
+    "role": "Co-Founder / Lead Engineer. Led a 9-day sprint to deliver the payment collection and payout MVP. Owned end-to-end system design, hardware integration, and institutional rollout.",
+    "architecture": "Dockerized NestJS backend services, Next.js administrative web interfaces, and React Native mobile applications. PostgreSQL with Row-Level Security (RLS) handles tenant isolation, while Redis manages session caching and queues. Features a custom TCP communications bridge written in PHP to interface with Chinese-manufactured NFC hardware.",
+    "decisions": [
+      "Led a rapid 9-day sprint to build and ship the payment collection and payout MVP.",
+      "Wrote a custom TCP socket server in PHP from scratch to parse the low-level communication protocol used by Chinese-manufactured NFC devices, bridging it to NestJS.",
+      "Designed strict institutional hierarchy (schools, departments, staff) directly into the domain model before individual user accounts.",
+      "Implemented NFC cards as a unified identity layer, enabling access control, attendance, and closed-loop cashless payments on school campuses.",
+      "Integrated Paystack for payment processing, handling webhook reconciliation, transaction verification, and edge failure recovery."
+    ],
+    "challenges": "Delivering a functional hardware-integrated MVP in 9 days and scaling to 15,000 active users while maintaining strict transaction reconciliation and tenant isolation.",
+    "outcome": "Processed fee collections for over 4,000 students at Federal University of Agriculture Abeokuta. Deployed daily NFC attendance and cashless payments for over 1,000 students at Foursquare School. Shipped the initial MVP to production in exactly 9 days.",
+    "lessons": "Velocity and structure are not mutually exclusive. A disciplined, 9-day sprint focused on the core TCP/NestJS integration laid a robust foundation that successfully scaled to 15,000 users without architectural rewrites."
+  },
+  {
+    "id": "frootify",
+    "name": "Frootify",
+    "url": "https://frootify.tech",
+    "focus": [
+      "Laravel & React (Vite)",
+      "Workforce accountability",
+      "Public logistics APIs",
+      "Commerce optimization"
+    ],
+    "context": "Frootify is an asset-backed preventive healthcare business that transitioned from a walk-in retail model to a B2B2C, internet-enabled distribution system, optimizing logistics and staff accountability for multi-location operations.",
+    "role": "Lead Product Engineer, promoted to Chief Technology Officer. Owned technical strategy, stabilized the legacy backend, rebuilt the web frontend, and launched logistics APIs.",
+    "architecture": "Laravel backend with a PostgreSQL datastore, a React web frontend (built with Vite), and a React Native staff mobile application. Exposes a public logistics API (Dispatch Hub) for third-party logistics integration.",
+    "decisions": [
+      "Stabilized a legacy Laravel backend by cleaning up the service layer and implementing multi-role access control.",
+      "Re-engineered the web frontend using React and Vite, eliminating years of technical debt and accelerating developer delivery speed.",
+      "Built and launched a React Native mobile application for staff, incorporating device binding and geo-fencing to ensure attendance is only loggable on-premises.",
+      "Designed and shipped 'Dispatch Hub,' a public-facing Laravel API allowing third-party delivery businesses to consume Frootify's logistics and fulfillment pipeline.",
+      "Refactored order management and fulfillment logic in myBlongo (the core commerce platform), which unlocked a 5x increase in sales throughput."
+    ],
+    "challenges": "Bridging physical business operations (staff attendance, location-bound services, delivery riders) with digital systems while modernizing legacy frontend and backend codebases.",
+    "outcome": "Successfully launched the staff mobile app and Dispatch Hub API, modernized the front-end codebase, and achieved a 5x increase in order processing capacity, paving the way for scale and investor-readiness.",
+    "lessons": "In asset-heavy businesses, digital systems must enforce physical truth. Using device binding, geo-fencing, and public APIs builds a highly auditable, scalable system that business logic can trust."
+  },
+  {
+    "id": "circlify",
+    "name": "Circlify",
+    "url": "https://circlify.io",
+    "focus": [
+      "Group-based finance",
+      "Scheduled payouts",
+      "Regulatory compliance"
+    ],
+    "context": "Circlify is a community finance platform designed for UK diaspora groups and Nigerian cooperatives to coordinate rotating savings (Ajo/Chama), contribution pools, and payouts safely.",
+    "role": "Founder & System Architect. Managed product design, compliance decisions, database schema, and transaction guarantees.",
+    "architecture": "Group-centric system built with a modular NestJS/Laravel/Go backend. Features automated cycle management and scheduled payout engines with transaction guarantees. Built to run across UK and Nigerian regulatory spaces.",
+    "decisions": [
+      "Structured the system around circle admins as primary authorities, requiring explicit invitations and approvals for member onboarding to prioritize trust.",
+      "Designed and implemented the core rotational cycle scheduler and contribution tracking engine, securing transactional integrity for scheduled payouts.",
+      "Paused the Nigerian production rollout deliberately due to NDPR and local data-provider constraints, opting for compliance over premature expansion.",
+      "Conducted evaluation and migration of payment providers to replace Mono for compliance reasons.",
+      "Built isolated services for compliance-sensitive operations, allowing jurisdiction-specific configurations to be turned on/off without affecting core ledger logic."
+    ],
+    "challenges": "Ensuring transactional correctness in rotating financial circles where participants depend on scheduled, guaranteed payouts, while managing regulatory overhead across UK and Nigerian jurisdictions.",
+    "outcome": "Shipped a fully functional MVP supporting managed community savings circles, featuring robust authority controls, compliance guardrails, and audit trails.",
+    "lessons": "When dealing with community money, trust is a design requirement. By setting strict administrative boundaries and aligning with compliance early, the system protects both users and the business."
+  },
+  {
+    "id": "nogic",
+    "name": "NOGIC Portal",
+    "url": "https://nogicjqs.gov.ng",
+    "focus": [
+      "Government compliance",
+      "Laravel 4 legacy migration",
+      "NestJS & Next.js transition",
+      "Developer onboarding"
+    ],
+    "context": "NOGIC JQS is a government compliance and workforce monitoring portal built for the Nigerian Content Development and Monitoring Board (NCDMB). The system manages regulatory approvals, contractor registries, and compliance checks at a national level.",
+    "role": "Full-Stack Engineer. Managed legacy Laravel 4 core systems, built new compliance modules, and initiated/led the transition to a modern NestJS and Next.js architecture.",
+    "architecture": "Legacy PHP Laravel 4 monolithic architecture. Target migrated architecture is built with NestJS for backend services, Next.js for portal frontends, and PostgreSQL for secure datastore management.",
+    "decisions": [
+      "Delivered 4 new high-priority compliance modules within the legacy Laravel 4 system while maintaining full backwards compatibility and production uptime.",
+      "Initiated, designed, and executed a migration strategy to shift core services from a Laravel 4 monolith to NestJS and Next.js.",
+      "Onboarded and mentored 3 separate engineering teams to the new NestJS/Next.js codebase, ensuring a smooth transition of development practices.",
+      "Took sole ownership of backend engineering and feature delivery for the NCDMB compliance system during its final legacy phases."
+    ],
+    "challenges": "Maintaining a highly active legacy Laravel 4 application with zero downtime while designing a parallel migration path to NestJS and onboarding multiple development teams.",
+    "outcome": "Successfully maintained the NCDMB platform, delivered new modules under strict government timelines, and successfully migrated core application paths to the new NestJS service layer.",
+    "lessons": "Migrating legacy systems requires a double-run strategy: preserve the monolithic core for stability while carving out modular services. Developer onboarding and documentation are just as critical as architectural design."
+  }
+]

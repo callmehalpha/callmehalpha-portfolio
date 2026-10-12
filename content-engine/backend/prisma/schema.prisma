@@ -1,0 +1,293 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum SourceKind {
+  PROJECT_UPDATE
+  CV
+}
+
+enum SourceStatus {
+  RECEIVED
+  PROCESSING
+  DONE
+  FAILED
+  SKIPPED
+}
+
+enum ContentStatus {
+  DRAFT
+  PENDING_APPROVAL
+  APPROVED
+  PUBLISHED
+  REJECTED
+}
+
+enum PubStatus {
+  PENDING
+  PUBLISHED
+  FAILED
+  SKIPPED
+}
+
+enum PersonaKind {
+  PERSONALITY
+  BRANDING
+}
+
+enum ProjectKind {
+  CLIENT
+  PRODUCT
+  OSS
+}
+
+enum OssRole {
+  AUTHOR
+  MAINTAINER
+  CONTRIBUTOR
+}
+
+enum ApprovalStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  EXPIRED
+}
+
+model SourceDocument {
+  id              String         @id @default(cuid())
+  kind            SourceKind     @default(PROJECT_UPDATE)
+  filename        String
+  contentHash     String         @unique
+  projectId       String?
+  project         Project?       @relation(fields: [projectId], references: [id])
+  frontmatter     Json?
+  rawMarkdown     String
+  originalPath    String?
+  routing         Json?
+  status          SourceStatus   @default(RECEIVED)
+  error           String?
+  triggerAttempts Int            @default(0)
+  lastTriggeredAt DateTime?
+  receivedAt      DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  notes           Note[]
+  runs            PipelineRun[]
+
+  @@index([status, receivedAt])
+}
+
+model Project {
+  id        String           @id @default(cuid())
+  slug      String           @unique
+  name      String
+  kind      ProjectKind
+  url       String?
+  repoUrl   String?
+  visible   Boolean          @default(true)
+  sortOrder Int              @default(0)
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+  sources   SourceDocument[]
+  caseStudy CaseStudy?
+  oss       OssProject?
+  notes     Note[]
+}
+
+model PersonaDocument {
+  id          String      @id @default(cuid())
+  kind        PersonaKind
+  version     Int
+  filename    String
+  content     String
+  contentHash String
+  distilled   Json?
+  active      Boolean     @default(false)
+  createdAt   DateTime    @default(now())
+
+  @@unique([kind, version])
+}
+
+model Note {
+  id            String          @id @default(cuid())
+  sourceId      String?
+  source        SourceDocument? @relation(fields: [sourceId], references: [id])
+  projectId     String?
+  project       Project?        @relation(fields: [projectId], references: [id])
+  slug          String          @unique
+  title         String
+  excerpt       String
+  bodyMarkdown  String
+  tags          String[]
+  pillars       String[]
+  coverImageUrl String?
+  seo           Json?
+  socialDrafts  Json?
+  llmMeta       Json?
+  status        ContentStatus   @default(DRAFT)
+  publishedAt   DateTime?
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  publications  Publication[]
+
+  @@index([status, publishedAt])
+}
+
+model CaseStudy {
+  id                String              @id @default(cuid())
+  projectId         String              @unique
+  project           Project             @relation(fields: [projectId], references: [id])
+  currentRevisionId String?             @unique
+  currentRevision   CaseStudyRevision?  @relation("CurrentRevision", fields: [currentRevisionId], references: [id])
+  revisions         CaseStudyRevision[] @relation("Revisions")
+}
+
+model CaseStudyRevision {
+  id           String        @id @default(cuid())
+  caseStudyId  String
+  caseStudy    CaseStudy     @relation("Revisions", fields: [caseStudyId], references: [id])
+  currentOf    CaseStudy?    @relation("CurrentRevision")
+  version      Int
+  focus        String[]
+  context      String
+  role         String
+  architecture String
+  decisions    String[]
+  challenges   String
+  outcome      String
+  lessons      String
+  changelog    String
+  sourceIds    String[]
+  llmMeta      Json?
+  status       ContentStatus @default(DRAFT)
+  createdAt    DateTime      @default(now())
+
+  @@unique([caseStudyId, version])
+}
+
+model OssProject {
+  id            String            @id @default(cuid())
+  projectId     String            @unique
+  project       Project           @relation(fields: [projectId], references: [id])
+  role          OssRole
+  summary       String
+  myImpact      String
+  stack         String[]
+  highlights    String[]
+  githubStats   Json?
+  llmMeta       Json?
+  status        ContentStatus     @default(DRAFT)
+  updatedAt     DateTime          @updatedAt
+  contributions OssContribution[]
+}
+
+model OssContribution {
+  id           String     @id @default(cuid())
+  ossProjectId String
+  ossProject   OssProject @relation(fields: [ossProjectId], references: [id])
+  kind         String
+  title        String
+  url          String     @unique
+  mergedAt     DateTime?
+  summary      String?
+}
+
+model Profile {
+  id                String            @id @default("me")
+  currentRevisionId String?           @unique
+  currentRevision   ProfileRevision?  @relation("CurrentProfileRevision", fields: [currentRevisionId], references: [id])
+  revisions         ProfileRevision[] @relation("ProfileRevisions")
+}
+
+model ProfileRevision {
+  id        String        @id @default(cuid())
+  profileId String
+  profile   Profile       @relation("ProfileRevisions", fields: [profileId], references: [id])
+  currentOf Profile?      @relation("CurrentProfileRevision")
+  version   Int
+  data      Json
+  privacy   Json
+  changelog String
+  sourceIds String[]
+  llmMeta   Json?
+  status    ContentStatus @default(DRAFT)
+  createdAt DateTime      @default(now())
+
+  @@unique([profileId, version])
+}
+
+model ApprovalItem {
+  id                String         @id @default(cuid())
+  entityType        String
+  entityId          String
+  status            ApprovalStatus @default(PENDING)
+  resumeUrl         String?
+  resumeDeliveredAt DateTime?
+  expiresAt         DateTime
+  decidedAt         DateTime?
+  createdAt         DateTime       @default(now())
+
+  @@index([entityType, entityId])
+}
+
+model Setting {
+  key       String   @id
+  value     Json
+  updatedAt DateTime @updatedAt
+}
+
+model Channel {
+  id           String        @id @default(cuid())
+  key          String        @unique
+  name         String
+  enabled      Boolean       @default(false)
+  workflow     String
+  config       Json
+  publications Publication[]
+}
+
+model Notifier {
+  id       String  @id @default(cuid())
+  key      String  @unique
+  name     String
+  enabled  Boolean @default(false)
+  workflow String
+  config   Json
+}
+
+model Publication {
+  id          String    @id @default(cuid())
+  noteId      String
+  channelId   String
+  note        Note      @relation(fields: [noteId], references: [id])
+  channel     Channel   @relation(fields: [channelId], references: [id])
+  content     String
+  mediaUrls   String[]
+  status      PubStatus @default(PENDING)
+  externalId  String?
+  externalUrl String?
+  attempts    Int       @default(0)
+  lastError   String?
+  publishedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([noteId, channelId])
+}
+
+model PipelineRun {
+  id             String         @id @default(cuid())
+  sourceId       String
+  source         SourceDocument @relation(fields: [sourceId], references: [id])
+  n8nExecutionId String?
+  stage          String
+  status         String
+  meta           Json?
+  startedAt      DateTime       @default(now())
+  finishedAt     DateTime?
+}
