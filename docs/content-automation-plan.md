@@ -1,6 +1,6 @@
 # Content Automation Engine — Implementation Plan (Draft v2)
 
-> Status: **Phases 1–2 implemented** (see [`content-engine/README.md`](../content-engine/README.md)); phases 3+ planned · Owner: callmehalpha · Last updated: 2026-10-12
+> Status: **Phases 1–3 and 7 (hardening) implemented** (see [`content-engine/README.md`](../content-engine/README.md), deploy with [`GO-LIVE.md`](GO-LIVE.md)); phases 4–6 and 8 planned · Owner: callmehalpha · Last updated: 2026-10-12
 >
 > v2 changes: decisions recorded (§14), the engine now feeds **three portfolio sections** (Technical Notes, Technical Case Studies, Open Source Projects), the Products section is retired, approval is a runtime toggle, and notifications are pluggable like publishing channels.
 >

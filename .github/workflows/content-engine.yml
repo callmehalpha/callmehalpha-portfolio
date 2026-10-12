@@ -40,6 +40,23 @@ jobs:
       - run: npm run test:e2e
       - run: npm run build
 
+  scripts:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: content-engine/scripts
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Shell scripts parse and pass shellcheck
+        run: bash -n backup.sh && bash -n restore.sh && shellcheck backup.sh restore.sh
+      - name: export-commits tests
+        run: |
+          git config --global user.name ci && git config --global user.email ci@example.com
+          node --test export-commits.test.mjs
+
   image:
     runs-on: ubuntu-latest
     steps:

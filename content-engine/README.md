@@ -9,7 +9,7 @@ inbox/cv/*      Postgres = system of record          approvals by email
 persona/*.md
 ```
 
-## What's built (phases 1–2)
+## What's built
 
 | Area | Status |
 |---|---|
@@ -22,8 +22,9 @@ persona/*.md
 | Runtime approval toggles, channel and notifier registries, idempotent per-channel publications | ✅ |
 | Email via SMTP from `.env`, HTML template with action buttons and attachments | ✅ |
 | Seed of today's 5 case studies, the existing note (with its LinkedIn post) and the current hero copy | ✅ |
+| Portfolio reads notes, case studies, open source and profile from the API (phase 3) | ✅ |
+| Hardening: nightly backups + restore, token-expiry emails, security headers, per-client rate limits behind Caddy, log rotation, `export-commits` | ✅ |
 | n8n workflows (router, generators, LinkedIn/X publishers) | ⏳ next |
-| Portfolio pages reading from the API | ⏳ |
 | Resume PDF builds (Gotenberg) | ⏳ |
 
 ## Run it locally
@@ -55,6 +56,8 @@ sweeper retries them; nothing is lost.
 
 ## Production
 
+Step-by-step deploy: **[docs/GO-LIVE.md](../docs/GO-LIVE.md)**.
+
 ```bash
 docker compose --profile production up -d --build
 ```
@@ -64,6 +67,20 @@ its webhooks and the OAuth callback stay public so LinkedIn and X can reach them
 container runs as `CONTENT_UID:CONTENT_GID`, which must own `./inbox` on the host.
 
 Back up `N8N_ENCRYPTION_KEY` separately from the database: without it n8n can't decrypt any saved credential.
+
+## Operations
+
+| Script | What it does |
+|---|---|
+| `scripts/backup.sh` | Dumps both databases, archives `storage/`, exports n8n workflows and (still encrypted) credentials into `backups/<UTC timestamp>/` with checksums; keeps `KEEP_DAYS` (14). Run nightly from cron. |
+| `scripts/restore.sh <dir>` | Verifies checksums, stops backend and n8n, restores both databases and `storage/`, starts them again. Asks for confirmation (`--yes` to skip). |
+| `scripts/export-commits.mjs <repo> --project <slug>` | Turns a repo's recent git history into an inbox file (frontmatter, commits, files touched, a Notes section for you to fill in). |
+
+Also built in:
+- **Token-expiry emails:** record `config.tokenExpiresAt` on a channel; you're emailed 7 days and 1 day before, and on expiry.
+- **Behind Caddy:** `TRUST_PROXY=1` so rate limits apply per visitor, not to Caddy's single IP.
+- **Every response** carries `nosniff`, `DENY` framing, `no-referrer` and a strict CSP.
+- **Container logs** rotate at 5 × 10 MB.
 
 ## Tests
 

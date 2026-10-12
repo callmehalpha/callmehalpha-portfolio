@@ -1,11 +1,23 @@
 # TLS is automatic. The API is public; the n8n editor sits behind basic auth,
 # while its webhooks and the OAuth callback stay reachable for LinkedIn/X.
+
+(security) {
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options nosniff
+		Referrer-Policy strict-origin-when-cross-origin
+		-Server
+	}
+}
+
 {$API_DOMAIN} {
+	import security
 	encode gzip
 	reverse_proxy backend:3000
 }
 
 {$N8N_DOMAIN} {
+	import security
 	@public path /webhook/* /webhook-waiting/* /rest/oauth2-credential/callback
 	handle @public {
 		reverse_proxy n8n:5678
@@ -16,4 +28,12 @@
 		}
 		reverse_proxy n8n:5678
 	}
+}
+
+# The portfolio itself (node server.mjs on the host, port 3003). Only used when this Caddy also
+# serves the main site; if nginx or another proxy already does, leave PORTFOLIO_DOMAIN unset.
+{$PORTFOLIO_DOMAIN} {
+	import security
+	encode gzip
+	reverse_proxy {$PORTFOLIO_UPSTREAM}
 }

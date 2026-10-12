@@ -6,8 +6,10 @@ import { AdminTokenGuard } from './common/auth.guards';
 import { ZodPipe } from './common/zod.pipe';
 import { ContentPublisher, ENTITY_TYPES } from './content/content-publisher.service';
 import { IngestService } from './ingest/ingest.service';
+import { TokenExpiryService } from './ops/token-expiry.service';
 import { PersonaService } from './persona/persona.service';
 import { PrismaService } from './prisma/prisma.service';
+import { ProfileService } from './profile/profile.service';
 import { projectPatch, ProjectsService } from './projects/projects.service';
 import { registryPatch, RegistryService } from './registry/registry.service';
 import { SettingsService } from './settings/settings.service';
@@ -29,7 +31,26 @@ export class AdminController {
     private readonly caseStudies: CaseStudiesService,
     private readonly persona: PersonaService,
     private readonly ingest: IngestService,
+    private readonly tokenExpiry: TokenExpiryService,
+    private readonly profile: ProfileService,
   ) {}
+
+  @Get('profile/revisions')
+  profileRevisions() {
+    return this.profile.revisions();
+  }
+
+  @Get('profile/revisions/:id')
+  profileRevision(@Param('id') id: string) {
+    return this.profile.getRevision(id);
+  }
+
+  /** Runs the token-expiry check now instead of waiting for the hourly job. */
+  @Post('ops/token-expiry/check')
+  @HttpCode(200)
+  checkTokenExpiry() {
+    return this.tokenExpiry.check();
+  }
 
   @Get('settings')
   getSettings() {
