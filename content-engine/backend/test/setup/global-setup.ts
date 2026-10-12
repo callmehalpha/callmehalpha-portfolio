@@ -11,7 +11,7 @@ function sh(cmd: string) {
 
 /**
  * Gives the e2e suite a real, empty, migrated Postgres. Uses TEST_DATABASE_URL when set (CI service
- * container); otherwise starts a throwaway postgres:16-alpine container on a free port.
+ * container); otherwise starts a throwaway postgres:17-alpine container on a free port.
  */
 export default async function globalSetup() {
   let url = process.env.TEST_DATABASE_URL;
@@ -23,7 +23,7 @@ export default async function globalSetup() {
     } catch {
       /* not running */
     }
-    sh(`docker run -d --name ${CONTAINER} -e POSTGRES_PASSWORD=e2e -e POSTGRES_DB=content_e2e -p 127.0.0.1::5432 postgres:16-alpine`);
+    sh(`docker run -d --name ${CONTAINER} -e POSTGRES_PASSWORD=e2e -e POSTGRES_DB=content_e2e -p 127.0.0.1::5432 postgres:17-alpine`);
     container = CONTAINER;
     const port = sh(`docker port ${CONTAINER} 5432/tcp`).split(':').pop();
     url = `postgresql://postgres:e2e@127.0.0.1:${port}/content_e2e`;
