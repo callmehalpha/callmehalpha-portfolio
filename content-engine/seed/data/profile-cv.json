@@ -5,10 +5,21 @@
     "email": "abdulazeezyisau@gmail.com",
     "url": "https://abdulazeez.usaiy.xyz",
     "summary": "Technical product builder with 6+ years shipping payments, healthcare and operational platforms end to end. I work primarily in Node.js and NestJS with TypeScript and PostgreSQL, with production Go on a live payments exchange and a long background in PHP and Laravel, and I ship React, Next.js and React Native front ends. My work centres on systems where correctness matters: payout and settlement services, third-party API and webhook integrations, reconciliation, role-based access control and automated notification pipelines. I take products from business problem to production, often as the sole or lead engineer.",
-    "location": { "city": "Ibadan", "countryCode": "NG" },
+    "location": {
+      "city": "Ibadan",
+      "countryCode": "NG"
+    },
     "profiles": [
-      { "network": "LinkedIn", "username": "abdulazeez-yisau-tech-ceo", "url": "https://www.linkedin.com/in/abdulazeez-yisau-tech-ceo/" },
-      { "network": "GitHub", "username": "callmehalpha", "url": "https://github.com/callmehalpha" }
+      {
+        "network": "LinkedIn",
+        "username": "abdulazeez-yisau-tech-ceo",
+        "url": "https://www.linkedin.com/in/abdulazeez-yisau-tech-ceo/"
+      },
+      {
+        "network": "GitHub",
+        "username": "callmehalpha",
+        "url": "https://github.com/callmehalpha"
+      }
     ]
   },
   "positioning": {
@@ -17,11 +28,32 @@
     "intro": "6+ years building payments, healthcare and operational platforms end to end across fintech, healthcare and African markets: from a 15,000-user cashless payments platform I co-founded, to payout services processing 8,800+ transactions a week, to a telemedicine platform I took from concept to launch readiness as the sole engineer."
   },
   "heroStats": [
-    { "label": "Active users on a platform I co-founded", "value": "15,000+", "evidence": "Virtuo, live production (all three CVs)" },
-    { "label": "Payout transactions in one week, 98% success", "value": "8,800+", "evidence": "Atlax Exchange payout and settlement services across two providers (Full Stack and Backend CVs)" },
-    { "label": "Weeks from concept to launch-ready, sole engineer", "value": "10", "evidence": "DOKTA telemedicine platform, 42-item roadmap delivered ahead of schedule (Full Stack and Backend CVs)" },
-    { "label": "Order throughput after backend work", "value": "5×", "evidence": "Frootify / myBlongo order management refactor (Temitope CV, Frootify case study)" },
-    { "label": "Production platforms shipped", "value": "8", "evidence": "Live production portfolio (Temitope CV, portfolio)" }
+    {
+      "label": "Active users on a platform I co-founded",
+      "value": "15,000+",
+      "evidence": "Virtuo, live production (all three CVs)"
+    },
+    {
+      "label": "Payout transactions in one week, 98% success",
+      "value": "8,800+",
+      "evidence": "Atlax Exchange payout and settlement services across two providers (Full Stack and Backend CVs)"
+    },
+    {
+      "label": "Weeks from concept to launch-ready, sole engineer",
+      "value": "10",
+      "evidence": "DOKTA telemedicine platform, 42-item roadmap delivered ahead of schedule (Full Stack and Backend CVs)"
+    },
+    {
+      "label": "Order throughput after backend work",
+      "value": "5×",
+      "evidence": "Frootify / myBlongo order management refactor (Temitope CV, Frootify case study)"
+    },
+    {
+      "label": "Production platforms",
+      "value": "0",
+      "evidence": "Case studies live on the portfolio",
+      "derive": "case_study_count"
+    }
   ],
   "work": [
     {
@@ -64,7 +96,7 @@
       "startDate": "2025-01",
       "summary": "Product studio that builds and runs its own platforms and client products.",
       "highlights": [
-        "Own architecture, delivery and infrastructure across four platforms, from products live with paying vendors to systems in active development: Circlify, MÍRÀ Africa, GiftPing and BureauOS.",
+        "Own architecture, delivery and infrastructure across the studio's platforms: Circlify and GiftPing (in maintenance mode while I rework them, reopening mid-2027), BureauOS (in development) and MÍRÀ Africa (currently offline).",
         "Founded Circlify, a rotational savings (Ajo) and contributions platform rolled out under USAIY.",
         "Design multi-tenant systems with role-based access control and granular permissions as standard on every build.",
         "Build and operate transactional email and notification pipelines on self-hosted mail infrastructure."
@@ -119,16 +151,91 @@
     }
   ],
   "education": [
-    { "institution": "Olabisi Onabanjo University", "area": "Computer Science", "studyType": "BSc", "startDate": "2019", "endDate": "2022" },
-    { "institution": "Federal Polytechnic Ilaro", "area": "Computer Science", "studyType": "National Diploma", "startDate": "2015", "endDate": "2017" }
+    {
+      "institution": "Olabisi Onabanjo University",
+      "area": "Computer Science",
+      "studyType": "BSc",
+      "startDate": "2019",
+      "endDate": "2022"
+    },
+    {
+      "institution": "Federal Polytechnic Ilaro",
+      "area": "Computer Science",
+      "studyType": "National Diploma",
+      "startDate": "2015",
+      "endDate": "2017"
+    }
   ],
   "skills": [
-    { "name": "Backend", "keywords": ["Node.js", "NestJS", "TypeScript", "Go", "PostgreSQL", "REST API design", "Queues and background jobs", "Modular service architecture"] },
-    { "name": "Frontend", "keywords": ["React", "Next.js", "TypeScript", "Tailwind"] },
-    { "name": "Mobile", "keywords": ["React Native"] },
-    { "name": "Payments and fintech", "keywords": ["Payout and settlement", "Ledger and reconciliation", "Provider failover", "Tier-based limits", "Paystack", "Stripe"] },
-    { "name": "Platform", "keywords": ["Multi-tenancy", "Role-based access control", "Webhooks", "Transactional email", "Admin dashboards"] },
-    { "name": "Also", "keywords": ["PHP", "Laravel", "MySQL", "Redis", "Supabase", "Docker", "NGINX", "GitHub Actions"] }
+    {
+      "name": "Backend",
+      "keywords": [
+        "Node.js",
+        "NestJS",
+        "TypeScript",
+        "Go",
+        "PostgreSQL",
+        "REST API design",
+        "Queues and background jobs",
+        "Modular service architecture"
+      ]
+    },
+    {
+      "name": "Frontend",
+      "keywords": [
+        "React",
+        "Next.js",
+        "TypeScript",
+        "Tailwind"
+      ]
+    },
+    {
+      "name": "Mobile",
+      "keywords": [
+        "React Native"
+      ]
+    },
+    {
+      "name": "Payments and fintech",
+      "keywords": [
+        "Payout and settlement",
+        "Ledger and reconciliation",
+        "Provider failover",
+        "Tier-based limits",
+        "Paystack",
+        "Stripe"
+      ]
+    },
+    {
+      "name": "Platform",
+      "keywords": [
+        "Multi-tenancy",
+        "Role-based access control",
+        "Webhooks",
+        "Transactional email",
+        "Admin dashboards"
+      ]
+    },
+    {
+      "name": "Also",
+      "keywords": [
+        "PHP",
+        "Laravel",
+        "MySQL",
+        "Redis",
+        "Supabase",
+        "Docker",
+        "NGINX",
+        "GitHub Actions"
+      ]
+    }
   ],
-  "leadSkills": ["NestJS", "TypeScript", "Go", "PostgreSQL", "React", "Payments infrastructure"]
+  "leadSkills": [
+    "NestJS",
+    "TypeScript",
+    "Go",
+    "PostgreSQL",
+    "React",
+    "Payments infrastructure"
+  ]
 }

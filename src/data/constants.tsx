@@ -148,7 +148,7 @@ export const CASE_STUDIES: CaseStudy[] = [
     challenges:
       "Ensuring transactional correctness in rotating financial circles where participants depend on scheduled, guaranteed payouts, while managing regulatory overhead across UK and Nigerian jurisdictions.",
     outcome:
-      "Shipped a fully functional MVP supporting managed community savings circles, featuring robust authority controls, compliance guardrails, and audit trails.",
+      "Shipped a fully functional MVP supporting managed community savings circles, featuring robust authority controls, compliance guardrails, and audit trails. Circlify is currently in maintenance mode while I make changes, with a planned reopening in mid-2027.",
     lessons:
       "When dealing with community money, trust is a design requirement. By setting strict administrative boundaries and aligning with compliance early, the system protects both users and the business."
   },
@@ -160,7 +160,7 @@ export const CASE_STUDIES: CaseStudy[] = [
       "Government compliance",
       "Laravel 4 legacy migration",
       "NestJS & Next.js transition",
-      "Developer onboarding"
+      "Cross-team collaboration"
     ],
     context:
       "NOGIC JQS is a government compliance and workforce monitoring portal built for the Nigerian Content Development and Monitoring Board (NCDMB). The system manages regulatory approvals, contractor registries, and compliance checks at a national level.",
@@ -171,15 +171,15 @@ export const CASE_STUDIES: CaseStudy[] = [
     decisions: [
       "Delivered 4 new high-priority compliance modules within the legacy Laravel 4 system while maintaining full backwards compatibility and production uptime.",
       "Initiated and led the architecture-planning phase of the migration from a Laravel 4 monolith to NestJS and Next.js, then continued contributing to its delivery under the team lead.",
-      "Onboarded and mentored 3 separate engineering teams to the new NestJS/Next.js codebase, ensuring a smooth transition of development practices.",
+      "Collaborated with 3 engineering teams during the move to the new NestJS/Next.js codebase, aligning development practices across them.",
       "Took sole ownership of backend engineering and feature delivery for the NCDMB compliance system during its final legacy phases."
     ],
     challenges:
-      "Maintaining a highly active legacy Laravel 4 application with zero downtime while designing a parallel migration path to NestJS and onboarding multiple development teams.",
+      "Maintaining a highly active legacy Laravel 4 application with zero downtime while designing a parallel migration path to NestJS and working alongside multiple development teams.",
     outcome:
       "Successfully maintained the NCDMB platform, delivered new modules under strict government timelines, and successfully migrated core application paths to the new NestJS service layer.",
     lessons:
-      "Migrating legacy systems requires a double-run strategy: preserve the monolithic core for stability while carving out modular services. Developer onboarding and documentation are just as critical as architectural design."
+      "Migrating legacy systems requires a double-run strategy: preserve the monolithic core for stability while carving out modular services. Documentation and shared conventions across teams are just as critical as architectural design."
   }
 ];
 

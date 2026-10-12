@@ -44,9 +44,12 @@ directly onto resume variants in §6.7 of the plan.
 | C7 | **Virtuo** everywhere (no "Virtuosphere") |
 | C9 | Circlify: **I'm the founder**; it's a product rolled out under USAIY |
 
-Still open: C3 (platform count, kept at 8 as on the current site), C8 (MÍRÀ detail), C10 (GiftPing still live?),
-C12 (headline: the CV profile uses Technical Product Builder and waits for approval), and whether the
-"onboarded 3 engineering teams" line in the NOGIC case study still holds now that the team lead ran the later phases.
+| C3 | Platform count = **number of case studies live on the portfolio**, computed when served (`derive: case_study_count`) |
+| C8 | MÍRÀ Africa and its stores are **currently offline** |
+| C10 | GiftPing is live but in **maintenance mode**, like Circlify, while I make changes; both are planned to reopen **mid-2027** |
+| — | NOGIC: "onboarded and mentored 3 engineering teams" → **collaborated with 3 engineering teams** during the move |
+
+Still open: C12 (headline: the CV profile uses Technical Product Builder and waits for approval).
 
 The reconciled profile is `seed/data/profile-cv.json`. The seed adds it as a **draft** Profile revision; the site keeps the
 current copy until it's approved (`POST /admin/content/profile_revision/<id> {"action":"approve"}`).

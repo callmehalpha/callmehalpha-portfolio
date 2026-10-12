@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { FALLBACK_NOTES, FALLBACK_PROFILE, fallbackNote, formatMonth, formatRange, isoDate, slugify } from '../../src/lib/content';
-import { CAPABILITIES, PHILOSOPHIES } from '../../src/data/constants';
+import { CAPABILITIES, CASE_STUDIES, PHILOSOPHIES } from '../../src/data/constants';
 
 describe('content helpers', () => {
   it('formats months and ranges', () => {
@@ -37,5 +37,6 @@ describe('content helpers', () => {
     expect(FALLBACK_PROFILE.capabilities).toBe(CAPABILITIES);
     expect(FALLBACK_PROFILE.philosophies).toBe(PHILOSOPHIES);
     expect(FALLBACK_PROFILE.work).toEqual([]);
+    expect(FALLBACK_PROFILE.heroStats).toEqual([{ label: 'Production platforms', value: String(CASE_STUDIES.length), evidence: 'Case studies live on the portfolio' }]);
   });
 });

@@ -27,7 +27,17 @@ export const profileData = z.object({
     tagline: z.string().min(1),
     intro: z.string().min(1),
   }),
-  heroStats: z.array(z.object({ label: z.string(), value: z.string(), evidence: z.string().min(1) })).default([]),
+  heroStats: z
+    .array(
+      z.object({
+        label: z.string(),
+        value: z.string(),
+        evidence: z.string().min(1),
+        /** Computed when served instead of typed in, so it can't go stale. */
+        derive: z.enum(['case_study_count']).optional(),
+      }),
+    )
+    .default([]),
   capabilities: z.array(z.object({ title: z.string(), description: z.string(), items: z.array(z.string()) })).default([]),
   philosophies: z.array(z.object({ title: z.string(), description: z.string() })).default([]),
   work: z

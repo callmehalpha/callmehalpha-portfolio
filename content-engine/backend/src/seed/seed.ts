@@ -70,9 +70,9 @@ export function initialProfile(dir: string): ProfileData {
       headline: 'Systems & Architecture',
       tagline: 'I build high-integrity systems where trust, scale, and real-world constraints matter.',
       intro:
-        "I design and build backend systems where failure is expensive — spanning fintech, SaaS, commerce, and compliance. My focus is architectural clarity: authority-first design, transactional correctness, and software built to survive physical and regulatory constraints. I've engineered 8+ production platforms including digital asset exchanges, cashless institutional payments, and multi-tenant architectures.",
+        "I design and build backend systems where failure is expensive — spanning fintech, SaaS, commerce, and compliance. My focus is architectural clarity: authority-first design, transactional correctness, and software built to survive physical and regulatory constraints. I've engineered production platforms including digital asset exchanges, cashless institutional payments, and multi-tenant architectures.",
     },
-    heroStats: [{ label: 'Production platforms', value: '8+', evidence: 'Live production portfolio listed in the CV and on the portfolio' }],
+    heroStats: [{ label: 'Production platforms', value: '0', evidence: 'Case studies live on the portfolio', derive: 'case_study_count' }],
     capabilities: readJson(dir, 'capabilities.json'),
     philosophies: readJson(dir, 'philosophies.json'),
   });

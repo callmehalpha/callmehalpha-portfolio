@@ -15,7 +15,18 @@ export class ProfileService {
     const current = await this.current();
     if (!current) throw new NotFoundException('No published profile yet');
     const data = applyPrivacy(current.data as ProfileData, current.privacy as PrivacyMap);
-    return { ...data, version: current.version, updatedAt: current.createdAt };
+    return { ...data, heroStats: await this.deriveStats(data.heroStats ?? []), version: current.version, updatedAt: current.createdAt };
+  }
+
+  /** Fills in stats that are computed from live content, e.g. how many case studies are on the site. */
+  private async deriveStats(stats: ProfileData['heroStats']): Promise<ProfileData['heroStats']> {
+    if (!stats.some((s) => s.derive)) return stats;
+    const caseStudyCount = await this.prisma.project.count({
+      where: { visible: true, caseStudy: { currentRevisionId: { not: null } } },
+    });
+    return stats.map(({ derive, ...stat }) =>
+      derive === 'case_study_count' ? { ...stat, value: String(caseStudyCount) } : stat,
+    );
   }
 
   async current(): Promise<ProfileRevision | null> {

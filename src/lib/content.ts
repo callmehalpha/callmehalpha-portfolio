@@ -1,4 +1,4 @@
-import { BUILD_LOGS, CAPABILITIES, PHILOSOPHIES } from '../data/constants';
+import { BUILD_LOGS, CAPABILITIES, CASE_STUDIES, PHILOSOPHIES } from '../data/constants';
 import type { NoteDetail, NoteSummary, Profile } from '../types/content';
 
 export function slugify(input: string): string {
@@ -73,9 +73,9 @@ export const FALLBACK_PROFILE: Profile = {
     headline: 'Systems & Architecture',
     tagline: 'I build high-integrity systems where trust, scale, and real-world constraints matter.',
     intro:
-      "I design and build backend systems where failure is expensive — spanning fintech, SaaS, commerce, and compliance. My focus is architectural clarity: authority-first design, transactional correctness, and software built to survive physical and regulatory constraints. I've engineered 8+ production platforms including digital asset exchanges, cashless institutional payments, and multi-tenant architectures.",
+      "I design and build backend systems where failure is expensive — spanning fintech, SaaS, commerce, and compliance. My focus is architectural clarity: authority-first design, transactional correctness, and software built to survive physical and regulatory constraints. I've engineered production platforms including digital asset exchanges, cashless institutional payments, and multi-tenant architectures.",
   },
-  heroStats: [],
+  heroStats: [{ label: 'Production platforms', value: String(CASE_STUDIES.length), evidence: 'Case studies live on the portfolio' }],
   capabilities: CAPABILITIES,
   philosophies: PHILOSOPHIES,
   work: [],
