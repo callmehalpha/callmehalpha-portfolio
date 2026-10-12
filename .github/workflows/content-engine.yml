@@ -1,0 +1,50 @@
+name: content-engine
+
+on:
+  pull_request:
+    paths: ["content-engine/**", ".github/workflows/content-engine.yml"]
+  push:
+    branches: [main]
+    paths: ["content-engine/**", ".github/workflows/content-engine.yml"]
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: content-engine/backend
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_PASSWORD: e2e
+          POSTGRES_DB: content_e2e
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U postgres -d content_e2e"
+          --health-interval 5s --health-timeout 5s --health-retries 20
+    env:
+      TEST_DATABASE_URL: postgresql://postgres:e2e@localhost:5432/content_e2e
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: content-engine/backend/package-lock.json
+      - run: npm ci
+      - run: npx prisma generate
+      - run: npm run typecheck
+      - run: npm run test:unit
+      - run: npm run test:e2e
+      - run: npm run build
+
+  image:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build backend image
+        run: docker build -f content-engine/backend/Dockerfile content-engine
+      - name: Validate compose file
+        working-directory: content-engine
+        run: cp .env.example .env && sed -i 's/=$/=ci-placeholder-value-0123456789/' .env && docker compose config -q

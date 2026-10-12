@@ -1,6 +1,6 @@
 # Content Automation Engine — Implementation Plan (Draft v2)
 
-> Status: **Draft for review** · Owner: callmehalpha · Last updated: 2026-10-12
+> Status: **Phases 1–2 implemented** (see [`content-engine/README.md`](../content-engine/README.md)); phases 3+ planned · Owner: callmehalpha · Last updated: 2026-10-12
 >
 > v2 changes: decisions recorded (§14), the engine now feeds **three portfolio sections** (Technical Notes, Technical Case Studies, Open Source Projects), the Products section is retired, approval is a runtime toggle, and notifications are pluggable like publishing channels.
 >
@@ -184,7 +184,7 @@ Same VPS as the portfolio. Caddy fronts everything, so the existing `node server
 
 | Service | Image | Exposed | Notes |
 |---|---|---|---|
-| `postgres` | `postgres:16-alpine` | internal only | Two databases: `content` (NestJS) and `n8n`, separate users. Volume `pgdata`. |
+| `postgres` | `postgres:17-alpine` (n8n 2.x needs 17+) | internal only | Two databases: `content` (NestJS) and `n8n`, separate users. Volume `pgdata`. |
 | `n8n` | `n8nio/n8n:<pinned>` | `n8n.<domain>` via Caddy | `DB_TYPE=postgresdb`, `N8N_ENCRYPTION_KEY` (**persist & back up — losing it bricks all saved credentials**), `WEBHOOK_URL`, `N8N_EDITOR_BASE_URL`, `GENERIC_TIMEZONE`, `N8N_RUNNERS_ENABLED=true`. Volume `n8n_data`. Public HTTPS is needed for LinkedIn/X OAuth callbacks. |
 | `backend` | `backend/Dockerfile` (multi-stage, `node:22-alpine`, non-root) | `api.<domain>` via Caddy | Mounts `./inbox` and `./persona`. Runs `prisma migrate deploy` on start. Healthcheck `GET /health`. |
 | `gotenberg` | `gotenberg/gotenberg:8` | internal only | HTML → PDF with headless Chromium for the resume. Kept in its own container so Chromium stays out of the backend image and is isolated. |

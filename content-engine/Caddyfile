@@ -1,0 +1,19 @@
+# TLS is automatic. The API is public; the n8n editor sits behind basic auth,
+# while its webhooks and the OAuth callback stay reachable for LinkedIn/X.
+{$API_DOMAIN} {
+	encode gzip
+	reverse_proxy backend:3000
+}
+
+{$N8N_DOMAIN} {
+	@public path /webhook/* /webhook-waiting/* /rest/oauth2-credential/callback
+	handle @public {
+		reverse_proxy n8n:5678
+	}
+	handle {
+		basic_auth {
+			{$N8N_EDITOR_USER} {$N8N_EDITOR_PASSWORD_HASH}
+		}
+		reverse_proxy n8n:5678
+	}
+}

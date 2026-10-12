@@ -1,0 +1,7 @@
+.env
+docker-compose.override.yml
+inbox/**
+!inbox/
+!inbox/*/
+!inbox/**/.gitkeep
+storage/
