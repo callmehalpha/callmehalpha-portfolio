@@ -18,10 +18,12 @@ describe('content API client', () => {
     await client.notes({ page: 2, pageSize: 5, tag: 'ai' });
     await client.notes();
     await client.note('a b');
+    await client.resumes();
     expect(fetchImpl.mock.calls.map((c) => c[0])).toEqual([
       'https://api.test/api/notes?page=2&pageSize=5&tag=ai',
       'https://api.test/api/notes',
       'https://api.test/api/notes/a%20b',
+      'https://api.test/api/resume',
     ]);
   });
 

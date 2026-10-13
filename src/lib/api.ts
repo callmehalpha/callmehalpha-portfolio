@@ -1,5 +1,5 @@
 import type { CaseStudy } from '../types';
-import type { NoteDetail, NoteList, OssProject, Profile } from '../types/content';
+import type { NoteDetail, NoteList, OssProject, Profile, ResumeDownload } from '../types/content';
 
 export class ApiError extends Error {
   constructor(
@@ -55,6 +55,7 @@ export function createApiClient({ baseUrl = '', timeoutMs = 5000, fetchImpl }: A
     caseStudies: (signal?: AbortSignal) => get<(CaseStudy & { version?: number })[]>('/api/case-studies', signal),
     oss: (signal?: AbortSignal) => get<OssProject[]>('/api/oss', signal),
     profile: (signal?: AbortSignal) => get<Profile>('/api/profile', signal),
+    resumes: (signal?: AbortSignal) => get<ResumeDownload[]>('/api/resume', signal),
   };
 }
 

@@ -25,7 +25,7 @@ persona/*.md
 | Portfolio reads notes, case studies, open source and profile from the API (phase 3) | ✅ |
 | Hardening: nightly backups + restore, token-expiry emails, security headers, per-client rate limits behind Caddy, log rotation, `export-commits` | ✅ |
 | n8n workflows (router, generators, LinkedIn/X publishers) | ⏳ next |
-| Resume PDF builds (Gotenberg) | ⏳ |
+| Resume: built from approved data on change (every 10 min), 3 versions (`default`, `backend`, `fullstack`), Gotenberg PDF, approval by email, `/api/resume.pdf` | ✅ |
 
 ## Run it locally
 
@@ -100,7 +100,7 @@ file on every PR that touches `content-engine/`.
 
 | Prefix | Auth | Used by |
 |---|---|---|
-| `/api/*` (GET) | none, rate limited | the portfolio |
+| `/api/*` (GET) | none, rate limited | the portfolio (incl. `/api/resume.pdf`) |
 | `/approvals/confirm`, `/approvals/decide` | signed token | links in approval emails |
 | `/api/ingest`, `/internal/*` | `Bearer INTERNAL_SERVICE_TOKEN` | n8n |
 | `/admin/*` | `Bearer ADMIN_TOKEN` | me |

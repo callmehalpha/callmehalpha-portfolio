@@ -53,6 +53,13 @@ export interface OssProject {
   contributions: OssContribution[];
 }
 
+export interface ResumeDownload {
+  variant: 'default' | 'backend' | 'fullstack';
+  publishedAt: string;
+  pages: number | null;
+  url: string;
+}
+
 export interface WorkEntry {
   name: string;
   position: string;

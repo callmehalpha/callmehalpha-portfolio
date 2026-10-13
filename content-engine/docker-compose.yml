@@ -37,6 +37,8 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+      gotenberg:
+        condition: service_started
     environment:
       DATABASE_URL: postgresql://content:${CONTENT_DB_PASSWORD}@postgres:5432/content
       INTERNAL_SERVICE_TOKEN: ${INTERNAL_SERVICE_TOKEN:?set INTERNAL_SERVICE_TOKEN}
@@ -49,6 +51,7 @@ services:
       N8N_EDITOR_URL: ${N8N_EDITOR_BASE_URL:-http://localhost:5678}
       # Only Caddy (or localhost) can reach the backend, so trusting one hop is safe.
       TRUST_PROXY: ${TRUST_PROXY:-1}
+      GOTENBERG_URL: http://gotenberg:3000
       NOTIFY_EMAIL_TO: ${NOTIFY_EMAIL_TO:-}
       INBOX_DIR: /data/inbox
       PERSONA_DIR: /data/persona
@@ -66,6 +69,18 @@ services:
       - storage:/data/storage
     ports:
       - "127.0.0.1:${BACKEND_PORT:-3000}:3000"
+
+  # HTML -> PDF for resume builds. Internal only; nothing outside the stack can reach it.
+  gotenberg:
+    image: gotenberg/gotenberg:8
+    restart: unless-stopped
+    logging: *logging
+    command: ["gotenberg", "--api-timeout=60s", "--chromium-auto-start=true"]
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fs http://127.0.0.1:3000/health || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
 
   n8n:
     image: n8nio/n8n:${N8N_VERSION:-2.42.7}
