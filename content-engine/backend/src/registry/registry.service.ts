@@ -20,6 +20,17 @@ export const registryInput = z.object({
 });
 export type RegistryInput = z.infer<typeof registryInput>;
 
+/** Shallow-merges a config patch: keys in the patch replace old ones, and `null` removes a key. */
+export function mergeConfig(current: Prisma.JsonValue, patch: Record<string, unknown> | undefined): Prisma.InputJsonValue | undefined {
+  if (!patch) return undefined;
+  const merged: Record<string, unknown> = { ...((current as Record<string, unknown> | null) ?? {}) };
+  for (const [key, value] of Object.entries(patch)) {
+    if (value === null) delete merged[key];
+    else merged[key] = value;
+  }
+  return merged as Prisma.InputJsonValue;
+}
+
 function eventsOf(config: Prisma.JsonValue): string[] {
   const events = (config as { events?: unknown } | null)?.events;
   return Array.isArray(events) ? events.filter((e): e is string => typeof e === 'string') : [];
@@ -50,12 +61,14 @@ export class RegistryService {
   }
 
   async patchChannel(key: string, patch: RegistryPatch) {
-    if (!(await this.prisma.channel.findUnique({ where: { key } }))) throw new NotFoundException(`Channel ${key} not found`);
-    return this.prisma.channel.update({ where: { key }, data: { ...patch, config: patch.config as Prisma.InputJsonValue } });
+    const existing = await this.prisma.channel.findUnique({ where: { key } });
+    if (!existing) throw new NotFoundException(`Channel ${key} not found`);
+    return this.prisma.channel.update({ where: { key }, data: { ...patch, config: mergeConfig(existing.config, patch.config) } });
   }
 
   async patchNotifier(key: string, patch: RegistryPatch) {
-    if (!(await this.prisma.notifier.findUnique({ where: { key } }))) throw new NotFoundException(`Notifier ${key} not found`);
-    return this.prisma.notifier.update({ where: { key }, data: { ...patch, config: patch.config as Prisma.InputJsonValue } });
+    const existing = await this.prisma.notifier.findUnique({ where: { key } });
+    if (!existing) throw new NotFoundException(`Notifier ${key} not found`);
+    return this.prisma.notifier.update({ where: { key }, data: { ...patch, config: mergeConfig(existing.config, patch.config) } });
   }
 }

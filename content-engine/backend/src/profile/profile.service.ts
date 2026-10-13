@@ -55,6 +55,19 @@ export class ProfileService {
     });
   }
 
+  /** Revision history without the full data, newest first; `current` marks the live one. */
+  async revisions() {
+    const [profile, rows] = await Promise.all([
+      this.prisma.profile.findUnique({ where: { id: PROFILE_ID } }),
+      this.prisma.profileRevision.findMany({
+        where: { profileId: PROFILE_ID },
+        select: { id: true, version: true, status: true, changelog: true, createdAt: true },
+        orderBy: { version: 'desc' },
+      }),
+    ]);
+    return rows.map((r) => ({ ...r, current: r.id === profile?.currentRevisionId }));
+  }
+
   async getRevision(id: string): Promise<ProfileRevision> {
     const rev = await this.prisma.profileRevision.findUnique({ where: { id } });
     if (!rev) throw new NotFoundException(`Profile revision ${id} not found`);

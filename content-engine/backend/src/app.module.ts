@@ -19,6 +19,7 @@ import { PersonaService } from './persona/persona.service';
 import { PipelineClient } from './pipeline/pipeline.client';
 import { RunsService } from './pipeline/runs.service';
 import { SweeperService } from './pipeline/sweeper.service';
+import { TokenExpiryService } from './ops/token-expiry.service';
 import { PrismaModule } from './prisma/prisma.module';
 import { ProfileService } from './profile/profile.service';
 import { ProjectsService } from './projects/projects.service';
@@ -55,6 +56,7 @@ import { SettingsModule } from './settings/settings.module';
     RegistryService,
     PublicationsService,
     MailService,
+    TokenExpiryService,
   ],
 })
 export class AppModule {}

@@ -1,9 +1,17 @@
 name: content-engine
 
+# Rotate container logs so they can't fill the disk.
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "5"
+
 services:
   postgres:
     image: postgres:17-alpine
     restart: unless-stopped
+    logging: *logging
     environment:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}
       CONTENT_DB_PASSWORD: ${CONTENT_DB_PASSWORD:?set CONTENT_DB_PASSWORD}
@@ -25,6 +33,7 @@ services:
     # Must own ./inbox on the host (the watcher moves files to processed/ and failed/).
     user: "${CONTENT_UID:-1000}:${CONTENT_GID:-1000}"
     restart: unless-stopped
+    logging: *logging
     depends_on:
       postgres:
         condition: service_healthy
@@ -37,6 +46,9 @@ services:
       N8N_WEBHOOK_SECRET: ${N8N_WEBHOOK_SECRET:?set N8N_WEBHOOK_SECRET}
       PUBLIC_SITE_URL: ${PUBLIC_SITE_URL:?set PUBLIC_SITE_URL}
       PUBLIC_API_URL: ${PUBLIC_API_URL:?set PUBLIC_API_URL}
+      N8N_EDITOR_URL: ${N8N_EDITOR_BASE_URL:-http://localhost:5678}
+      # Only Caddy (or localhost) can reach the backend, so trusting one hop is safe.
+      TRUST_PROXY: ${TRUST_PROXY:-1}
       NOTIFY_EMAIL_TO: ${NOTIFY_EMAIL_TO:-}
       INBOX_DIR: /data/inbox
       PERSONA_DIR: /data/persona
@@ -58,6 +70,7 @@ services:
   n8n:
     image: n8nio/n8n:${N8N_VERSION:-2.42.7}
     restart: unless-stopped
+    logging: *logging
     depends_on:
       postgres:
         condition: service_healthy
@@ -81,6 +94,12 @@ services:
       INTERNAL_SERVICE_TOKEN: ${INTERNAL_SERVICE_TOKEN}
       N8N_WEBHOOK_SECRET: ${N8N_WEBHOOK_SECRET}
       N8N_BLOCK_ENV_ACCESS_IN_NODE: "false"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:5678/healthz || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
     volumes:
       - n8n_data:/home/node/.n8n
       - ./n8n/workflows:/workflows:ro
@@ -90,6 +109,7 @@ services:
   caddy:
     image: caddy:2-alpine
     restart: unless-stopped
+    logging: *logging
     profiles: ["production"]
     depends_on: [backend, n8n]
     environment:
@@ -97,6 +117,10 @@ services:
       N8N_DOMAIN: ${N8N_DOMAIN:-n8n.localhost}
       N8N_EDITOR_USER: ${N8N_EDITOR_USER:-admin}
       N8N_EDITOR_PASSWORD_HASH: ${N8N_EDITOR_PASSWORD_HASH:-}
+      PORTFOLIO_DOMAIN: ${PORTFOLIO_DOMAIN:-portfolio.localhost}
+      PORTFOLIO_UPSTREAM: ${PORTFOLIO_UPSTREAM:-host.docker.internal:3003}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     ports:
       - "80:80"
       - "443:443"

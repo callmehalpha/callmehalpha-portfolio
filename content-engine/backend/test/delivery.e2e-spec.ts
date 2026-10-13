@@ -118,7 +118,7 @@ describe('delivery: publications, email, settings, registries (e2e)', () => {
     });
 
     it('refuses to send when no recipient is configured, and validates input', async () => {
-      await ctx.admin('patch', '/admin/notifiers/email').send({ config: { events: [] } }).expect(200);
+      await ctx.admin('patch', '/admin/notifiers/email').send({ config: { to: null } }).expect(200);
       await ctx.internal('post', '/internal/notify/email').send({ subject: 's', markdown: 'm' }).expect(400);
       await ctx.internal('post', '/internal/notify/email').send({ subject: '', markdown: 'm', to: 'not-an-email' }).expect(400);
     });

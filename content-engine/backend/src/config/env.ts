@@ -19,6 +19,10 @@ export const envSchema = z.object({
 
   PUBLIC_SITE_URL: z.string().url(),
   PUBLIC_API_URL: z.string().url(),
+  /** n8n editor, linked from token-expiry emails. */
+  N8N_EDITOR_URL: z.string().url().optional(),
+  /** Number of reverse proxies in front of the app (Caddy = 1), so rate limits see real client IPs. */
+  TRUST_PROXY: z.coerce.number().int().min(0).default(0),
 
   INBOX_DIR: z.string().default('/data/inbox'),
   PERSONA_DIR: z.string().default('/data/persona'),

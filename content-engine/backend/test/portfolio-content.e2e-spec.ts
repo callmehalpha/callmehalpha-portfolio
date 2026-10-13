@@ -214,8 +214,15 @@ describe('portfolio content: case studies, open source, profile (e2e)', () => {
     });
 
     it('seeds the CV-based profile as a draft that goes live only once approved', async () => {
-      const draft = await ctx.prisma.profileRevision.findFirstOrThrow({ where: { status: 'DRAFT' } });
-      expect(draft.version).toBe(2);
+      const list = await ctx.admin('get', '/admin/profile/revisions').expect(200);
+      expect(list.body.map((r: { version: number; status: string; current: boolean }) => [r.version, r.status, r.current])).toEqual([
+        [2, 'DRAFT', false],
+        [1, 'PUBLISHED', true],
+      ]);
+      expect(list.body[0]).not.toHaveProperty('data');
+      const full = await ctx.admin('get', `/admin/profile/revisions/${list.body[0].id}`).expect(200);
+      expect(full.body.data.basics.label).toBe('Technical Product Builder');
+      const draft = { id: list.body[0].id as string };
       expect((await ctx.http().get('/api/profile')).body.basics.label).toBe('Systems Engineer & Technical Founder');
 
       await ctx.admin('post', `/admin/content/profile_revision/${draft.id}`).send({ action: 'approve' }).expect(200);
