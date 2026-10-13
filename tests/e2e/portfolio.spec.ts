@@ -20,6 +20,16 @@ test.describe('homepage, live content from the API', () => {
     await expect(page.getByText('Fixture philosophy')).toBeVisible();
   });
 
+  test('offers the approved resume for download in the hero and contact sections', async ({ page }) => {
+    await page.goto('/');
+    const links = page.getByRole('link', { name: /Download Resume|^Resume$/ });
+    await expect(links).toHaveCount(2);
+    for (const link of await links.all()) {
+      await expect(link).toHaveAttribute('href', 'http://127.0.0.1:4010/api/resume.pdf');
+      await expect(link).toHaveAttribute('download', '');
+    }
+  });
+
   test('case studies come from the API', async ({ page }) => {
     await page.goto('/');
     await expect(page.locator('#fixture-exchange')).toContainText('Fixture Exchange');
@@ -103,6 +113,7 @@ test.describe('when the content API is down', () => {
     await expect(page.locator('#build-logs')).toContainText('The Case for Modular Monoliths');
     await expect(page.locator('#experience')).toHaveCount(0);
     await expect(page.locator('#open-source')).toContainText('The first projects are on their way.');
+    await expect(page.getByRole('link', { name: /Download Resume/ })).toHaveCount(0); // no resume to offer
   });
 
   test('the built-in note still opens on the site', async ({ page, request }) => {

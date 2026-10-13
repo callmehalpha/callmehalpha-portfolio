@@ -23,6 +23,7 @@ export const ENTITY_LABEL: Record<EntityType, string> = {
   case_study_revision: 'case study update',
   oss_project: 'open-source entry',
   profile_revision: 'profile update',
+  resume_build: 'resume',
 };
 
 @Injectable()

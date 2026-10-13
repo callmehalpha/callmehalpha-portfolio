@@ -6,8 +6,8 @@ Commands assume Ubuntu 22.04/24.04 and a user with `sudo`. Replace `usaiy.xyz` n
 **After this you'll have:** `https://api.usaiy.xyz` (content API + approval links), `https://n8n.usaiy.xyz`
 (n8n editor behind a password), the portfolio reading live content, nightly backups, and email alerts.
 
-**Not live yet (later PRs):** the n8n workflows that write drafts and post to LinkedIn/X, and the resume
-download. Files dropped in the inbox are stored and wait; nothing is lost.
+**Not live yet (later PRs):** the n8n workflows that write drafts and post to LinkedIn/X. Files dropped in the
+inbox are stored and wait; nothing is lost.
 
 ---
 
@@ -197,6 +197,18 @@ curl -s -X POST https://api.usaiy.xyz/admin/content/profile_revision/<draft-id> 
 ```
 
 Roll back the same way by publishing version 1 again (`{"action":"publish"}` on its id).
+
+**First resume.** Builds run every 10 minutes when approved content has changed; trigger the first one now:
+
+```bash
+curl -s -X POST https://api.usaiy.xyz/admin/resume/build -H "authorization: Bearer $ADMIN_TOKEN" \
+  -H 'content-type: application/json' -d '{}'
+```
+
+That builds the `default`, `backend` and `fullstack` versions. Each arrives by email with the PDF attached and
+Approve/Reject buttons. Once `default` is approved, a **Download Resume** button appears on the homepage
+(`/api/resume.pdf`, plus `?variant=backend` and `?variant=fullstack`). Turn the approval step off with
+`approval.required.resume` if you'd rather have new builds go live directly.
 
 **Approval toggles** (all on by default):
 `curl -X PATCH https://api.usaiy.xyz/admin/settings/approval.required.note -H "authorization: Bearer $ADMIN_TOKEN" -H 'content-type: application/json' -d '{"value":false}'`

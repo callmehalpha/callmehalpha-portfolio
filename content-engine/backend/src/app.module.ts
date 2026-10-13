@@ -20,6 +20,9 @@ import { PipelineClient } from './pipeline/pipeline.client';
 import { RunsService } from './pipeline/runs.service';
 import { SweeperService } from './pipeline/sweeper.service';
 import { TokenExpiryService } from './ops/token-expiry.service';
+import { GotenbergClient } from './resume/gotenberg.client';
+import { ResumeAdminController, ResumePublicController } from './resume/resume.controller';
+import { ResumeService } from './resume/resume.service';
 import { PrismaModule } from './prisma/prisma.module';
 import { ProfileService } from './profile/profile.service';
 import { ProjectsService } from './projects/projects.service';
@@ -36,7 +39,7 @@ import { SettingsModule } from './settings/settings.module';
     ScheduleModule.forRoot(),
     ThrottlerModule.forRoot([{ ttl: 60_000, limit: Number(process.env.THROTTLE_LIMIT ?? 120) }]),
   ],
-  controllers: [HealthController, PublicController, ApprovalsController, InternalController, AdminController],
+  controllers: [HealthController, PublicController, ResumePublicController, ApprovalsController, InternalController, AdminController, ResumeAdminController],
   providers: [
     ServiceTokenGuard,
     AdminTokenGuard,
@@ -57,6 +60,8 @@ import { SettingsModule } from './settings/settings.module';
     PublicationsService,
     MailService,
     TokenExpiryService,
+    GotenbergClient,
+    ResumeService,
   ],
 })
 export class AppModule {}

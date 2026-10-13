@@ -111,6 +111,9 @@ http
     if (url.pathname === '/api/profile') return send(res, 200, FIXTURES.profile);
     if (url.pathname === '/api/case-studies') return send(res, 200, FIXTURES.caseStudies);
     if (url.pathname === '/api/oss') return send(res, 200, FIXTURES.oss);
+    if (url.pathname === '/api/resume') {
+      return send(res, 200, [{ variant: 'default', publishedAt: '2026-10-13T00:00:00.000Z', pages: 2, url: `http://127.0.0.1:${PORT}/api/resume.pdf` }]);
+    }
     if (url.pathname === '/api/notes') {
       const page = Number(url.searchParams.get('page') || 1);
       const pageSize = Number(url.searchParams.get('pageSize') || 10);

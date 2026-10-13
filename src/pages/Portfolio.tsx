@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Menu, X, ArrowRight, ChevronRight, Terminal, 
-  Mail, Linkedin, ShieldCheck, Cpu, Layout, Twitter
+  Mail, Linkedin, ShieldCheck, Cpu, Layout, Twitter, Download
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { CASE_STUDIES } from '../data/constants';
@@ -16,9 +16,10 @@ import { api } from '../lib/api';
 import { FALLBACK_NOTES, FALLBACK_PROFILE } from '../lib/content';
 import { useContent } from '../lib/useContent';
 import type { CaseStudy } from '../types';
-import type { OssProject } from '../types/content';
+import type { OssProject, ResumeDownload } from '../types/content';
 
 const NO_OSS: OssProject[] = [];
+const NO_RESUME: ResumeDownload[] = [];
 
 export const Portfolio = () => {
   const [activeNav, setActiveNav] = useState('hero');
@@ -28,6 +29,9 @@ export const Portfolio = () => {
   const { data: caseStudies } = useContent<CaseStudy[]>((signal) => api.caseStudies(signal), CASE_STUDIES);
   const { data: notes } = useContent((signal) => api.notes({ pageSize: 6 }, signal).then((r) => r.items), FALLBACK_NOTES);
   const { data: ossProjects } = useContent((signal) => api.oss(signal), NO_OSS);
+  const { data: resumes } = useContent((signal) => api.resumes(signal), NO_RESUME);
+  // Only offered once an approved resume exists.
+  const resume = resumes.find((r) => r.variant === 'default');
   const hasExperience = profile.work.length > 0;
   const github = profile.basics.profiles.find((p) => p.network === 'GitHub');
 
@@ -157,6 +161,16 @@ export const Portfolio = () => {
             >
               Connect
             </a>
+            {resume && (
+              <a
+                href={resume.url}
+                download
+                onClick={() => window.umami?.track('resume_download', { location: 'hero' })}
+                className="text-zinc-300 border border-zinc-800 px-8 py-4 rounded font-bold flex items-center gap-2 transition-all duration-300 hover:text-white hover:border-zinc-600 hover:scale-105 active:scale-[0.98]"
+              >
+                <Download size={18} /> Download Resume
+              </a>
+            )}
           </div>
         </div>
       </Section>
@@ -323,6 +337,19 @@ export const Portfolio = () => {
                 </div>
                 LinkedIn
               </a>
+              {resume && (
+                <a
+                  href={resume.url}
+                  download
+                  onClick={() => window.umami?.track('resume_download', { location: 'contact' })}
+                  className="flex items-center gap-3 text-white font-bold group focus:outline-none focus-visible:ring-2 focus-visible:ring-white/50 focus-visible:bg-white/5 rounded-xl transition-all p-2 -m-2"
+                >
+                  <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center group-hover:bg-white/30 group-focus-visible:bg-white/30 transition-colors">
+                    <Download size={20} />
+                  </div>
+                  Resume
+                </a>
+              )}
             </div>
           </div>
         </div>

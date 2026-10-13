@@ -3,7 +3,7 @@ import { ContentStatus, Prisma } from '@prisma/client';
 import { assertTransition } from '../common/content-status';
 import { PrismaService } from '../prisma/prisma.service';
 
-export const ENTITY_TYPES = ['note', 'case_study_revision', 'oss_project', 'profile_revision'] as const;
+export const ENTITY_TYPES = ['note', 'case_study_revision', 'oss_project', 'profile_revision', 'resume_build'] as const;
 export type EntityType = (typeof ENTITY_TYPES)[number];
 export type ContentAction = 'submit' | 'approve' | 'reject' | 'publish' | 'withdraw';
 
@@ -17,6 +17,7 @@ export const APPROVAL_SETTING: Record<EntityType, string> = {
   case_study_revision: 'approval.required.case_study',
   oss_project: 'approval.required.oss',
   profile_revision: 'approval.required.profile',
+  resume_build: 'approval.required.resume',
 };
 
 /**
@@ -80,6 +81,9 @@ export class ContentPublisher {
         case 'oss_project':
           await tx.ossProject.update({ where: { id }, data: { status: to } });
           break;
+        case 'resume_build':
+          await tx.resumeBuild.update({ where: { id }, data: { status: to, publishedAt: to === 'PUBLISHED' ? new Date() : undefined } });
+          break;
         case 'case_study_revision':
           await tx.caseStudyRevision.update({ where: { id }, data: { status: to } });
           break;
@@ -135,6 +139,8 @@ export class ContentPublisher {
         return this.prisma.note.findUnique({ where: { id }, select });
       case 'oss_project':
         return this.prisma.ossProject.findUnique({ where: { id }, select });
+      case 'resume_build':
+        return this.prisma.resumeBuild.findUnique({ where: { id }, select });
       case 'case_study_revision':
         return this.prisma.caseStudyRevision.findUnique({ where: { id }, select });
       case 'profile_revision':

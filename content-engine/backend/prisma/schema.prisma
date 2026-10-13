@@ -291,3 +291,23 @@ model PipelineRun {
   startedAt      DateTime       @default(now())
   finishedAt     DateTime?
 }
+
+/// A rendered resume. Built when the approved content behind it changes; served once PUBLISHED.
+model ResumeBuild {
+  id          String        @id @default(cuid())
+  variant     String
+  /// sha256 of the inputs (public profile, case studies, OSS entries, template version).
+  contentHash String
+  inputs      Json
+  curated     Json
+  pdfPath     String
+  htmlPath    String
+  pages       Int?
+  status      ContentStatus @default(DRAFT)
+  error       String?
+  createdAt   DateTime      @default(now())
+  publishedAt DateTime?
+
+  @@unique([variant, contentHash])
+  @@index([variant, status, publishedAt])
+}

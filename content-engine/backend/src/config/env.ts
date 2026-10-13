@@ -27,6 +27,8 @@ export const envSchema = z.object({
   INBOX_DIR: z.string().default('/data/inbox'),
   PERSONA_DIR: z.string().default('/data/persona'),
   STORAGE_DIR: z.string().default('/data/storage'),
+  /** Gotenberg (HTML → PDF) for resume builds; builds are skipped when unset. */
+  GOTENBERG_URL: z.string().url().optional(),
   WATCH_ENABLED: bool.default('true'),
   WATCH_POLL_INTERVAL_MS: z.coerce.number().int().positive().default(5000),
   SWEEP_STUCK_AFTER_MINUTES: z.coerce.number().int().positive().default(5),

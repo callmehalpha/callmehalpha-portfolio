@@ -23,6 +23,45 @@ export function databaseUrl(): string {
   return (JSON.parse(readFileSync(STATE_FILE, 'utf8')) as { url: string }).url;
 }
 
+/** The real Gotenberg started by the global setup (or CI's service container). */
+export function realGotenbergUrl(): string {
+  return (JSON.parse(readFileSync(STATE_FILE, 'utf8')) as { gotenbergUrl: string }).gotenbergUrl;
+}
+
+/** Stands in for Gotenberg: records the HTML it was sent and answers with a small PDF. */
+export class FakeGotenberg {
+  html: string[] = [];
+  status = 200;
+  private server!: Server;
+  base = '';
+
+  async start() {
+    this.server = createServer((req, res) => {
+      const chunks: Buffer[] = [];
+      req.on('data', (c) => chunks.push(c));
+      req.on('end', () => {
+        const body = Buffer.concat(chunks).toString('utf8');
+        const start = body.indexOf('<!doctype html>');
+        const end = body.indexOf('</html>');
+        if (start >= 0 && end > start) this.html.push(body.slice(start, end + 7));
+        if (this.status !== 200) {
+          res.statusCode = this.status;
+          return res.end('render failed');
+        }
+        res.setHeader('content-type', 'application/pdf');
+        res.end(makePdf(`Rendered resume ${this.html.length}`));
+      });
+    });
+    await new Promise<void>((r) => this.server.listen(0, '127.0.0.1', () => r()));
+    this.base = `http://127.0.0.1:${(this.server.address() as AddressInfo).port}`;
+    return this;
+  }
+
+  stop() {
+    return new Promise<void>((r) => this.server.close(() => r()));
+  }
+}
+
 // ── Fake n8n ──────────────────────────────────────────────────────
 export interface RecordedRequest {
   path: string;
